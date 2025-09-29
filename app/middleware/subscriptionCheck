@@ -1,0 +1,31 @@
+from django.http import HttpResponseForbidden
+from django.shortcuts import redirect
+from django.urls import reverse, NoReverseMatch
+
+class SubscriptionCheckMiddleware:
+    
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        # Let unauthenticated users, API requests, and admin traffic pass
+        if (not request.user.is_authenticated or
+                request.path.startswith('/api/') or
+                request.path.startswith('/admin/')):
+            return self.get_response(request)
+
+        # Avoid an infinite redirect loop on the subscription page itself
+        try:
+            if request.path == reverse('subscription_page'):
+                return self.get_response(request)
+        except NoReverseMatch:
+            # The subscription_page URL might not exist yet, proceed.
+            pass
+
+        # Perform the check and redirect if necessary
+        if not request.user.profile.has_valid_subscription():
+            # This assumes you have a URL pattern with name='subscription_page'
+            return HttpResponseForbidden("Subscription not active.")
+
+
+        return self.get_response(request)

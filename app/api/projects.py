@@ -142,6 +142,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
                            'permissions': normalized_perm_names(perms[user])})
         
         result.sort(key=lambda r: r['owner'], reverse=True)
+        print("Debug: permissions", result)
         return Response(result, status=status.HTTP_200_OK)
     
     @action(detail=True, methods=['post'])
