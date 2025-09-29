@@ -15,6 +15,7 @@ from .workers import CheckTask, GetTaskResult
 from .users import UsersList
 from .externalauth import ExternalTokenAuth
 from webodm import settings
+from app.api.users import UserSubscriptionStatus
 
 router = routers.DefaultRouter()
 router.register(r'projects', ProjectViewSet)
@@ -62,6 +63,7 @@ urlpatterns = [
     url(r'^token-auth/', obtain_jwt_token),
 
     url(r'^plugins/(?P<plugin_name>[^/.]+)/(.*)$', api_view_handler),
+    url(r'users/subscription-status', UserSubscriptionStatus.as_view()),
 ]
 
 if settings.ENABLE_USERS_API:

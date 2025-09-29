@@ -21,4 +21,13 @@ class UsersList(APIView):
             except ValueError:
                 raise exceptions.ValidationError(detail="Invalid query parameters")
 
-        return Response([{'username': u.username, 'email': u.email} for u in qs])
+        # Include is_subscribed status
+        return Response([{'username': u.username, 'email': u.email, 'is_subscribed': hasattr(u, 'profile') and u.profile.is_subscribed} for u in qs])
+
+class UserSubscriptionStatus(APIView):
+    permission_classes = (permissions.IsAuthenticated,)
+    
+    def get(self, request):
+        user = request.user
+        is_subscribed = hasattr(user, 'profile') and user.profile.is_subscribed
+        return Response({'is_subscribed': is_subscribed})

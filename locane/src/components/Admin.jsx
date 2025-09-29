@@ -19,6 +19,7 @@ function Admin({ changeView }) {
         email: '',
         is_staff: false,
         is_active: false,
+        is_subscribed: true,
         groups: [],
         user_permissions: []
     });
@@ -81,7 +82,7 @@ function Admin({ changeView }) {
     const openUserDialog = (user = null) => {
         setCurrentUser(user);
         const initialData = user ? {
-            // Include password as received from API (not editable in UI)
+            // Include existing fields
             password: user.password || '',
             is_superuser: user.is_superuser || false,
             username: user.username || '',
@@ -90,9 +91,11 @@ function Admin({ changeView }) {
             email: user.email || '',
             is_staff: user.is_staff || false,
             is_active: user.is_active || false,
+            is_subscribed: user.is_subscribed !== undefined ? user.is_subscribed : true, 
             groups: user.groups || [],
             user_permissions: user.user_permissions || []
         } : {
+            // Default values for new user
             password: '',
             is_superuser: false,
             username: '',
@@ -101,6 +104,7 @@ function Admin({ changeView }) {
             email: '',
             is_staff: false,
             is_active: false,
+            is_subscribed: true, 
             groups: [],
             user_permissions: []
         };
@@ -265,6 +269,14 @@ function Admin({ changeView }) {
                             <label>
                                 <input type="checkbox" checked={formData.is_active} onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })} /> Active
                             </label>
+                            <label>
+                                <input 
+                                    type="checkbox" 
+                                    checked={formData.is_subscribed} 
+                                    onChange={(e) => setFormData({ ...formData, is_subscribed: e.target.checked })} 
+                                /> 
+                                Subscribed User
+                            </label>
                             <button type="submit">OK</button>
                             <button type="button" onClick={closeUserDialog}>Cancel</button>
                         </form>
@@ -283,6 +295,7 @@ function Admin({ changeView }) {
                         <p><strong>Superuser:</strong> {selectedUser.is_superuser ? 'Yes' : 'No'}</p>
                         <p><strong>Staff:</strong> {selectedUser.is_staff ? 'Yes' : 'No'}</p>
                         <p><strong>Active:</strong> {selectedUser.is_active ? 'Yes' : 'No'}</p>
+                        <p><strong>Subscribed:</strong> {selectedUser.is_subscribed ? 'Yes' : 'No'}</p>
                         <p><strong>Groups:</strong> {selectedUser.groups.join(', ')}</p>
                         <p><strong>Permissions:</strong> {selectedUser.user_permissions.join(', ')}</p>
                         <button onClick={() => setShowUserInfoDialog(false)}>Close</button>

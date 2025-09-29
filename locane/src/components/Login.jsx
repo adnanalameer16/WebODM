@@ -76,6 +76,18 @@ function Login({ setIsLogged }) {
         } catch (adminError) {
           console.warn("Admin check failed, defaulting to non-superuser:", adminError);
         }
+        
+        // Fetch subscription status
+        try {
+          const subscriptionResponse = await authorizedFetch("/api/users/subscription-status");
+          if (subscriptionResponse.ok) {
+            const subscriptionData = await subscriptionResponse.json();
+            sessionStorage.setItem("is_subscribed", subscriptionData.is_subscribed);
+            console.log("User subscription status:", subscriptionData.is_subscribed ? "Subscribed" : "Not subscribed");
+          }
+        } catch (subscriptionError) {
+          console.warn("Failed to fetch subscription status:", subscriptionError);
+        }
 
         setIsLogged(true);
       } else {
