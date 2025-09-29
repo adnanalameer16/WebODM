@@ -1,163 +1,227 @@
-.project-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 1rem;
-  padding: 1rem;
+.project-box-outer {
+  background: #7b2ff7;
+  border-radius: 16px;
+  width: 100%;
+  display: flex;
 }
 
-.project-box {
+.project-box-outer:hover {
+}
+
+.project-box-inner {
   background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 12px;
-  padding: 1rem;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  transition: transform 0.2s ease;
+  border-radius: 16px;
+  min-height: 200px;
+  width: 80%;
+  margin: 2px
 }
 
-.project-box:hover {
-  transform: translateY(-5px);
+.project-header {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+  margin: 1rem;
+}
+
+.project-title-section {
+  display: flex;
+  align-items: center;
+  flex: 1;
 }
 
 .project-title {
-  font-size: 1.2rem;
+  font-size: 1.4rem;
   font-weight: bold;
   color: #222;
 }
 
 .project-description {
   font-size: 0.9rem;
-  color: #555;
+  color: #666;
+  line-height: 1.4;
 }
 
-.add-button {
+
+.progress-circle {
+  position: relative;
+  width: 60px;
+  height: 60px;
+}
+
+.circular-chart {
+  width: 60px;
+  height: 60px;
+  transform: rotate(-90deg);
+}
+
+.circle-bg {
+  fill: none;
+  stroke: #e6e6e6;
+  stroke-width: 3;
+}
+
+.circle {
+  fill: none;
+  stroke: #007bff;
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.percentage {
   position: absolute;
-  top: 1rem;
-  right: 1rem;
-  background: #007bff;
-  color: white;
-  padding: 0.6rem 1rem;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-weight: bold;
+  font-size: 0.9rem;
+  color: #007bff;
 }
 
-.add-button:hover {
-  background: #0056b3;
-}
-
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.5);
+.project-actions-outer {
   display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.action-button {
+  width: 20px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
   justify-content: center;
-  align-items: center;
-}
-
-.modal-content {
-  background: #fff;
-  padding: 2rem;
-  border-radius: 12px;
-  width: 400px;
-  max-width: 90%;
-}
-
-.modal-content h2 {
-  margin-top: 0;
-}
-
-.modal-content input,
-.modal-content textarea {
-  width: 100%;
-  margin-bottom: 1rem;
-  padding: 0.6rem;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-}
-
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 1rem;
-}
-
-.modal-actions button {
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 6px;
   cursor: pointer;
-}
-
-.modal-actions .save-btn {
-  background: #007bff;
+  font-size: 1.2rem;
   color: white;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  background-color: transparent !important;
 }
 
-.modal-actions .cancel-btn {
-  background: #ddd;
+.dialog p {
+  margin-bottom: 1.5rem;
+  font-size: 1.1rem;
+  color: #333;
 }
-.project-actions {
-  display: flex;
-  justify-content: flex-start;
-  gap: 1rem;
-  margin-top: 0.5rem;
-}
-
-.edit-link, .task-link {
-  display: flex;
-  align-items: center;
-  font-size: 0.85rem;
+/* Edit button next to title */
+.edit-link {
   color: #007bff;
   cursor: pointer;
-  text-decoration: none;
+  font-size: 1rem;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+  padding: 4px;
+  border-radius: 4px;
 }
 
-.edit-link:hover, .task-link:hover, .view-task-link:hover {
-  text-decoration: none;
+.edit-link:hover {
+  opacity: 1;
+  background-color: rgba(0, 123, 255, 0.1);
+}
+
+/* Editing mode styles */
+.project-actions {
+  display: flex;
+  margin-left: 1rem;
+  gap: 1rem;
+  margin-top: 8px;
+}
+
+.editarea{
+  width: 75%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .edit-input,
 .edit-textarea {
+  margin-top: 8px;
   width: 100%;
-  margin-bottom: 0.5rem;
-  padding: 0.2rem 0.4rem;
-  border: 1px solid #bbb;
-  border-radius: 4px;
-  background: transparent;
+  margin-left: 16px;
+  padding: 12px;
+  border: 2px solid #e1e5e9;
+  border-radius: 8px;
+  background: #f8f9fa;
   font-size: 1.2rem;
   font-weight: bold;
   color: #222;
   box-shadow: none;
   outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.edit-input:focus,
+.edit-textarea:focus {
+  border-color: #007bff;
+  background: #fff;
 }
 
 .edit-textarea {
   resize: none;
   font-size: 0.9rem;
+  font-weight: normal;
   color: #555;
 }
 
-.save-link, .cancel-link, .delete-link, .view-task-link {
+.save-link, .cancel-link {
   cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
 }
 
+.save-link {
+  background-color: #28a745;
+  color: white;
+}
+
+.save-link:hover {
+  background-color: #218838;
+}
+
+.cancel-link {
+  background-color: #6c757d;
+  color: white;
+}
+
+.cancel-link:hover {
+  background-color: #545b62;
+}
+
+/* Delete dialog actions */
 .delete-dialog-actions {
   display: flex;
   gap: 1rem;
   justify-content: center;
 }
+
 .delete-dialog-btn {
   background: #e74c3c;
   color: #fff;
-  border-radius: 6px;
-  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  padding: 10px 20px;
   border: none;
   cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
 }
+
+.delete-dialog-btn:hover {
+  background: #c82333;
+}
+
 .delete-dialog-btn.no {
-  background: #ddd;
-  color: #222;
+  background: #6c757d;
+  color: #fff;
+}
+
+.delete-dialog-btn.no:hover {
+  background: #545b62;
+}
+
+.delete-dialog-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
