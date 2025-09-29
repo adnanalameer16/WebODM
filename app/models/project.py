@@ -30,8 +30,7 @@ class Project(models.Model):
     created_at = models.DateTimeField(default=timezone.now, help_text=_("Creation date"), verbose_name=_("Created at"))
     deleting = models.BooleanField(db_index=True, default=False, help_text=_("Whether this project has been marked for deletion. Projects that have running tasks need to wait for tasks to be properly cleaned up before they can be deleted."), verbose_name=_("Deleting"))
     tags = models.TextField(db_index=True, default="", blank=True, help_text=_("Project tags"), verbose_name=_("Tags"))
-    public = models.BooleanField(defau
-    lt=False, help_text=_("A flag indicating whether this project is available to the public"), verbose_name=_("Public"))
+    public = models.BooleanField(default=False, help_text=_("A flag indicating whether this project is available to the public"), verbose_name=_("Public"))
     public_edit = models.BooleanField(default=False, help_text=_("A flag indicating whether this public project can be edited"), verbose_name=_("Public Edit"))
     public_id = models.UUIDField(db_index=True, default=None, unique=True, blank=True, null=True, help_text=_("Public identifier of the project"), verbose_name=_("Public Id"))
     
