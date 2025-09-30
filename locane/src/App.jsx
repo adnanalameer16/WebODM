@@ -66,10 +66,6 @@ function App() {
                                 setIsSuperuser={(value) =>
                                     setUserDetails((prev) => ({ ...prev, is_superuser: value }))
                                 }
-                                isSubscribed={userDetails.is_subscribed}
-                                setIsSubscribed={(value) =>
-                                    setUserDetails((prev) => ({ ...prev, is_subscribed: value }))
-                                }
                             />
                         }
                     />

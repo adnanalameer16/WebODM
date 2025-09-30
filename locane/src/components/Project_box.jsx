@@ -3,13 +3,25 @@ import { useNavigate } from 'react-router-dom';
 import "./Project_box.css";
 import { authorizedFetch } from '../utils/api.js';
 
-const ProjectBox = ({ project, onAddTask, onEditProject, onShowDeleteDialog, changeView, refreshTasks, isSubscribed }) => {
+const ProjectBox = ({ project, onAddTask, onEditProject, onShowDeleteDialog, changeView, refreshTasks }) => {
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [editedName, setEditedName] = useState(project.name);
   const [editedDescription, setEditedDescription] = useState(project.description || "");
   const [hasTasks, setHasTasks] = useState(false);
   const [runningTaskProgress, setRunningTaskProgress] = useState(null);
+
+  // Helper function for real-time subscription check
+  const checkSubscriptionStatus = async () => {
+    try {
+      const response = await authorizedFetch('/api/users/subscription-status');
+      const data = await response.json();
+      return data.is_subscribed || false;
+    } catch (error) {
+      console.error('Failed to check subscription status:', error);
+      return false;
+    }
+  };
 
   useEffect(() => {
     // Check if the project has tasks and get running task progress
@@ -116,8 +128,9 @@ const ProjectBox = ({ project, onAddTask, onEditProject, onShowDeleteDialog, cha
       </div>
     
         <div className="project-actions-outer">
-          <div className="action-button add-task-btn" onClick={() => {
-            if (!isSubscribed) {
+          <div className="action-button add-task-btn" onClick={async () => {
+            const isCurrentlySubscribed = await checkSubscriptionStatus();
+            if (!isCurrentlySubscribed) {
               alert('Subscription required');
               return;
             }

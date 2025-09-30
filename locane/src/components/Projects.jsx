@@ -3,9 +3,21 @@ import { authorizedFetch } from '../utils/api.js';
 import ProjectBox from './Project_box';
 import './Projects.css';
 
-const Projects = ({ projects, loading, onAddProject, onAddTask, onEditProject, fetchProjects, changeView, isSubscribed }) => {
+const Projects = ({ projects, loading, onAddProject, onAddTask, onEditProject, fetchProjects, changeView }) => {
   const [deleteDialogProject, setDeleteDialogProject] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  // Helper function for real-time subscription check
+  const checkSubscriptionStatus = async () => {
+    try {
+      const response = await authorizedFetch('/api/users/subscription-status');
+      const data = await response.json();
+      return data.is_subscribed || false;
+    } catch (error) {
+      console.error('Failed to check subscription status:', error);
+      return false;
+    }
+  };
 
   const handleDeleteProject = async (project) => {
     setIsDeleting(true);
@@ -24,8 +36,9 @@ const Projects = ({ projects, loading, onAddProject, onAddTask, onEditProject, f
 
   return (
     <div className="projects-container">
-      <button className="add-button" onClick={() => {
-        if (!isSubscribed) {
+      <button className="add-button" onClick={async () => {
+        const isCurrentlySubscribed = await checkSubscriptionStatus();
+        if (!isCurrentlySubscribed) {
           alert('Subscription required');
           return;
         }
@@ -45,7 +58,6 @@ const Projects = ({ projects, loading, onAddProject, onAddTask, onEditProject, f
               onEditProject={onEditProject}
               onShowDeleteDialog={setDeleteDialogProject}
               changeView={changeView}
-              isSubscribed={isSubscribed}
             />
           ))}
         </div>

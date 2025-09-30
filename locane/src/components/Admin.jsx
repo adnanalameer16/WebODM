@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './admin.css'
 import { authorizedFetch } from '../utils/api';
 
-function Admin({ changeView, isSuperuser, isSubscribed }) {
+function Admin({ changeView, isSuperuser }) {
     const [users, setUsers] = useState([]);
     const [showDeletePopup, setShowDeletePopup] = useState(false);
     const [showUserDialog, setShowUserDialog] = useState(false);

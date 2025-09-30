@@ -10,7 +10,7 @@ import Export from './Export.jsx';
 import { authorizedFetch } from '../utils/api.js';
 import Admin from './Admin.jsx';
 
-export default function MainMenu({ setIsLogged, username, isSuperuser, setIsSuperuser, isSubscribed, setIsSubscribed }) {
+export default function MainMenu({ setIsLogged, username, isSuperuser, setIsSuperuser }) {
     const [activeView, setActiveView] = useState("dash");
     const [projects, setProjects] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -211,22 +211,35 @@ export default function MainMenu({ setIsLogged, username, isSuperuser, setIsSupe
         };
     }, [activeView, runningTasks, updateRunningTasksProgress]);
 
+    // Helper function for real-time subscription check
+    const checkSubscriptionStatus = async () => {
+        try {
+            const response = await authorizedFetch('/api/users/subscription-status');
+            const data = await response.json();
+            return data.is_subscribed || false;
+        } catch (error) {
+            console.error('Failed to check subscription status:', error);
+            return false;
+        }
+    };
 
-    const onAddProject=()=>{
-        if (!isSubscribed) {
+    const onAddProject = async () => {
+        const isCurrentlySubscribed = await checkSubscriptionStatus();
+        if (!isCurrentlySubscribed) {
             alert('Subscription required');
             return;
         }
         setActiveDialog("create-project");
-    }
-    const onAddTask=(projectId)=>{
-        if (!isSubscribed) {
+    };
+    const onAddTask = async (projectId) => {
+        const isCurrentlySubscribed = await checkSubscriptionStatus();
+        if (!isCurrentlySubscribed) {
             alert('Subscription required');
             return;
         }
         setActiveProjectId(projectId);
         setActiveDialog("edit-task");
-    }
+    };
     const DialogueManager = () => {
         useEffect(() => {
             const addCloseButtons = () => {
@@ -284,7 +297,7 @@ export default function MainMenu({ setIsLogged, username, isSuperuser, setIsSupe
             </div>
             <div className="main-view">
                 {activeView === "dash" && <h1>Dashboard</h1>}
-                {activeView === "gcp" && <GcpInterface isSubscribed={isSubscribed} />}
+                {activeView === "gcp" && <GcpInterface />}
                 {activeView === "proj" && (
                     <Projects
                         projects={projects}
@@ -297,7 +310,6 @@ export default function MainMenu({ setIsLogged, username, isSuperuser, setIsSupe
                         fetchProjects={fetchProjects}
                         changeView={handleViewChange}
                         refreshTasks={refreshTasks} // Pass refreshTasks to Projects
-                        isSubscribed={isSubscribed}
                     />
                 )}
                 {activeView === "tasks" && (
@@ -312,14 +324,12 @@ export default function MainMenu({ setIsLogged, username, isSuperuser, setIsSupe
                         filterProjectId={filterProjectId}
                         setFilterProjectId={setFilterProjectId}
                         projects={projects}
-                        isSubscribed={isSubscribed}
                     />
                 )}
                 {activeView === "admin" && (
                     <Admin
                         changeView={handleViewChange}
                         isSuperuser={isSuperuser} // Use prop passed from App.jsx
-                        isSubscribed={isSubscribed} // Use prop passed from App.jsx
                     />
                 )}
             </div>
@@ -358,7 +368,6 @@ export default function MainMenu({ setIsLogged, username, isSuperuser, setIsSupe
                             projectId={exportTask?.projectId}
                             taskId={exportTask?.taskId}
                             onClose={() => setActiveDialog("none")} // Pass onClose prop
-                            isSubscribed={isSubscribed}
                         />
                     </div>
                 </div>

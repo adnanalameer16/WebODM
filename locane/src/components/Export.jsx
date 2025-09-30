@@ -3,10 +3,22 @@ import ReactDOM from 'react-dom';
 import './Export.css';
 import { authorizedFetch } from '../utils/api.js';
 
-function Export({ projectId, taskId, onClose, openExportTaskId, setOpenExportTaskId, isSubscribed }) {
+function Export({ projectId, taskId, onClose, openExportTaskId, setOpenExportTaskId }) {
     const [assets, setAssets] = useState([]);
     const [loading, setLoading] = useState(true);
     const [dialogAsset, setDialogAsset] = useState(null);
+
+    // Helper function for real-time subscription check
+    const checkSubscriptionStatus = async () => {
+        try {
+            const response = await authorizedFetch('/api/users/subscription-status');
+            const data = await response.json();
+            return data.is_subscribed || false;
+        } catch (error) {
+            console.error('Failed to check subscription status:', error);
+            return false;
+        }
+    };
     
     // State for the dialog options
     const [projection, setProjection] = useState('EPSG:32643');
@@ -319,8 +331,9 @@ function Export({ projectId, taskId, onClose, openExportTaskId, setOpenExportTas
 
 	const isDropdownVisible = openExportTaskId === taskId;
 
-	const toggleDropdown = () => {
-		if (!isSubscribed) {
+	const toggleDropdown = async () => {
+		const isCurrentlySubscribed = await checkSubscriptionStatus();
+		if (!isCurrentlySubscribed) {
 			alert('Subscription required');
 			return;
 		}

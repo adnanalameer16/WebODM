@@ -7,6 +7,7 @@ import './GcpInterface.css';
 import ImageViewer from "./ImageViewer";
 import { useNavigate } from "react-router-dom";
 import Login from './Login';
+import { authorizedFetch } from '../utils/api.js';
 
 const MapBoundsUpdater = ({ bounds }) => {
     const map = useMap();
@@ -33,7 +34,7 @@ function distance2D(lat1, lon1, lat2, lon2) {
     return Math.sqrt(dLat * dLat + dLon * dLon);
 }
 
-function GcpInterface({ isSubscribed }) {
+function GcpInterface() {
     const [gcpPoints, setGcpPoints] = useState([]);
     const [images, setImages] = useState([]);
     const [showDirections, setShowDirections] = useState(false);
@@ -46,6 +47,18 @@ function GcpInterface({ isSubscribed }) {
     const gcpInputRef = useRef(null);
     const imageInputRef = useRef(null);
     const navigate = useNavigate();
+
+    // Helper function for real-time subscription check
+    const checkSubscriptionStatus = async () => {
+        try {
+            const response = await authorizedFetch('/api/users/subscription-status');
+            const data = await response.json();
+            return data.is_subscribed || false;
+        } catch (error) {
+            console.error('Failed to check subscription status:', error);
+            return false;
+        }
+    };
 
     const handleRemoveImage = (e, imageUrlToRemove) => {
         e.stopPropagation();
@@ -310,8 +323,9 @@ function GcpInterface({ isSubscribed }) {
                             onChange={handleGcpFileChange}
                             style={{ display: 'none' }}
                         />
-                        <button onClick={() => {
-                            if (!isSubscribed) {
+                        <button onClick={async () => {
+                            const isCurrentlySubscribed = await checkSubscriptionStatus();
+                            if (!isCurrentlySubscribed) {
                                 alert('Subscription required');
                                 return;
                             }
@@ -327,8 +341,9 @@ function GcpInterface({ isSubscribed }) {
                             onChange={handleImageChange}
                             style={{ display: 'none' }}
                         />
-                        <button onClick={() => {
-                            if (!isSubscribed) {
+                        <button onClick={async () => {
+                            const isCurrentlySubscribed = await checkSubscriptionStatus();
+                            if (!isCurrentlySubscribed) {
                                 alert('Subscription required');
                                 return;
                             }
