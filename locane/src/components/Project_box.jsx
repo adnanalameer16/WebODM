@@ -13,8 +13,11 @@ import {CancelOutlined, CancelRounded} from "@mui/icons-material";
 import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
 import {ArrowRight} from "@mui/icons-material";
 import Tasks from "./Tasks.jsx";
+
+
 const ProjectBox = ({ project, onAddTask, onEditProject, onShowDeleteDialog, changeView, refreshTasks }) => {
-  const navigate = useNavigate();
+  const [hovering,setHover]=useState(false);
+    const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [editedName, setEditedName] = useState(project.name);
   const [editedDescription, setEditedDescription] = useState(project.description || "");
@@ -83,7 +86,7 @@ const ProjectBox = ({ project, onAddTask, onEditProject, onShowDeleteDialog, cha
   };
 
   return (
-    <div className="project-box-outer">
+    <div className="project-box-outer" onMouseEnter={() => setHover(true)} onMouseLeave={()=>{setHover(false)}}>
       <div className="project-box-inner">
         {isEditing ? (
           <>
@@ -124,9 +127,11 @@ const ProjectBox = ({ project, onAddTask, onEditProject, onShowDeleteDialog, cha
             <div className="project-header">
               <div className="project-title-section">
                 <div className="project-title">{project.name.toUpperCase()}</div>
-                <div className="edit-link" onClick={handleEdit}>
-                  <EditIcon sx={{color:"gray"}}/>
-                </div>
+                  {hovering&&(<div className="edit-link" onClick={handleEdit}>
+
+                      <EditIcon sx={{color:"gray"}}/>
+                  </div>)}
+
               </div>
               <div className="project-description">
                 {project.description || "Project description lorem ipsum random words urulakkupperi dhashamoolam"}
@@ -143,13 +148,14 @@ const ProjectBox = ({ project, onAddTask, onEditProject, onShowDeleteDialog, cha
              <div
              className="progress-fill"
              style={{
-             width: `${(CompletedTasks/Tasks)*100}%`,
+             width: `${Tasks>0?(CompletedTasks/Tasks)*100:0}%`,
              transition: "width 0.5s ease",
          }}
       />
 
     </div>
-    <div>{CompletedTasks}/{Tasks}</div>
+              {hovering&&(
+    <div>{CompletedTasks}/{Tasks}</div>)}
 </div>
 
                   <div className="project-actions-outer"><div className="view-tasks">

@@ -14,6 +14,9 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     quota = models.FloatField(default=-1, blank=True, help_text=_("Maximum disk quota in megabytes"), verbose_name=_("Quota"))
 
+    def has_valid_subscription(self):
+        return True
+
     def has_quota(self):
         return self.quota != -1
 
