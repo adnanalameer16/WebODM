@@ -26,10 +26,10 @@
   }
   
   .project-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    max-width: 100%;
-    gap: 1.5rem;
+      display: grid;
+      /* This creates responsive columns that are at least 320px wide */
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1rem;
   }
   
   @media (min-width: 1200px) {

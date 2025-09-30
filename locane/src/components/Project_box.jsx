@@ -2,14 +2,26 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import "./Project_box.css";
 import { authorizedFetch } from '../utils/api.js';
+import Fab from '@mui/material/Fab';
+import AddIcon from '@mui/icons-material/Add';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+import Button from '@mui/material/Button';
+import ArrowRightIcon from '@mui/icons-material/ArrowRight';
+import {CancelOutlined, CancelRounded} from "@mui/icons-material";
 
+import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
+import {ArrowRight} from "@mui/icons-material";
+import Tasks from "./Tasks.jsx";
 const ProjectBox = ({ project, onAddTask, onEditProject, onShowDeleteDialog, changeView, refreshTasks }) => {
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [editedName, setEditedName] = useState(project.name);
   const [editedDescription, setEditedDescription] = useState(project.description || "");
   const [hasTasks, setHasTasks] = useState(false);
-  const [runningTaskProgress, setRunningTaskProgress] = useState(null);
+  const [Progress, setProgress] = useState(null);
+  const [CompletedTasks, setCompletedTasks] = useState(0);
+  const [Tasks, setTasks] = useState(0);
 
   useEffect(() => {
     // Check if the project has tasks and get running task progress
@@ -18,16 +30,19 @@ const ProjectBox = ({ project, onAddTask, onEditProject, onShowDeleteDialog, cha
         const response = await authorizedFetch(`/api/projects/${project.id}/tasks/`);
         const tasks = await response.json();
         setHasTasks(tasks.length > 0);
+        setTasks(tasks.length);
+
+          const completedTasksArray = tasks.filter(task => task.status === 40);
+
+          // Now, get the count from the new array's length
+          const completedCount = completedTasksArray.length;
+
+          setCompletedTasks( completedCount);
         
-        // Find running task and get its progress
-        const runningTask = tasks.find(task => 
-          task.status === 10 || task.status === 20 || task.status === 30 // Processing statuses
-        );
-        
-        if (runningTask) {
-          setRunningTaskProgress(runningTask.progress || 0);
+        if (CompletedTasks) {
+          setProgress(CompletedTasks);
         } else {
-          setRunningTaskProgress(null);
+            setProgress(0);
         }
       } catch (err) {
         console.error("Failed to fetch tasks: " + err.message);
@@ -73,6 +88,7 @@ const ProjectBox = ({ project, onAddTask, onEditProject, onShowDeleteDialog, cha
         {isEditing ? (
           <>
           <div className="editarea">
+
             <input
               type="text"
               value={editedName}
@@ -80,6 +96,7 @@ const ProjectBox = ({ project, onAddTask, onEditProject, onShowDeleteDialog, cha
               className="edit-input"
               placeholder="Project Name"
             />
+
             <textarea
               value={editedDescription}
               onChange={(e) => setEditedDescription(e.target.value)}
@@ -88,13 +105,17 @@ const ProjectBox = ({ project, onAddTask, onEditProject, onShowDeleteDialog, cha
               rows="3"
             />
             </div>
-            <div className="project-actions">
-              <div className="save-link" onClick={handleSave}>
-                💾 Save
-              </div>
-              <div className="cancel-link" onClick={handleCancel}>
-                ❌ Cancel
-              </div>
+              <div className="cancel">
+              <CancelRounded onClick={handleCancel}/></div>
+            <div className="save-button" >
+
+
+                <SaveOutlinedIcon
+                    onClick={handleSave}
+                    sx={{color:"gray"}}
+
+                />
+
             </div>
           
           </>
@@ -102,9 +123,9 @@ const ProjectBox = ({ project, onAddTask, onEditProject, onShowDeleteDialog, cha
           <>
             <div className="project-header">
               <div className="project-title-section">
-                <div className="project-title">{project.name}</div>
+                <div className="project-title">{project.name.toUpperCase()}</div>
                 <div className="edit-link" onClick={handleEdit}>
-                  ✏️
+                  <EditIcon sx={{color:"gray"}}/>
                 </div>
               </div>
               <div className="project-description">
@@ -112,22 +133,77 @@ const ProjectBox = ({ project, onAddTask, onEditProject, onShowDeleteDialog, cha
               </div>
             </div>
           </>
+
         )}
+
+         {!isEditing && (
+          <><div className="progress">
+
+             <div className="progress-bar">
+             <div
+             className="progress-fill"
+             style={{
+             width: `${(CompletedTasks/Tasks)*100}%`,
+             transition: "width 0.5s ease",
+         }}
+      />
+
+    </div>
+    <div>{CompletedTasks}/{Tasks}</div>
+</div>
+
+                  <div className="project-actions-outer"><div className="view-tasks">
+                      {hasTasks && (
+                      <Button
+                          size="small"
+                          variant="outlined"
+                          sx={{
+                              color: "white",
+                              backgroundColor: "black",
+                              borderColor: "gray",
+                              borderRadius: "40px",
+                              transition: "all 0.3s ease",
+                              "&:hover": {
+                                  paddingInline: 3,
+                              },
+                          }}
+                          onClick={() => {
+                              changeView("tasks", project.id);
+                          }}
+                      >
+                          {Tasks} Tasks <ArrowRightIcon />
+                      </Button>
+                   )}</div>
+                      <div className="project-actions">
+                          <div
+                              className="delete-icon"
+                              onClick={() => onShowDeleteDialog(project)}
+                          >
+                              <DeleteIcon sx={{ color: "grey" }} />
+                          </div>
+                          <Fab
+                              sx={{ zIndex: 10 }}
+                              color="primary"
+                              size="small"
+                              aria-label="add"
+                              onClick={() => onAddTask(project.id)}
+                          >
+                              <AddIcon />
+                          </Fab>
+                      </div>
+                  </div>
+
+
+
+
+
+          </>
+      )}
+
+
       </div>
-    
-        <div className="project-actions-outer">
-          <div className="action-button add-task-btn" onClick={() => onAddTask(project.id)}>
-            +
-          </div>
-          <div className="action-button delete-btn" onClick={() => onShowDeleteDialog(project)}>
-            🗑️
-          </div>
-          {hasTasks && (
-            <div className="action-button view-tasks-btn" onClick={() => changeView("tasks", project.id)}>
-              👁️
-            </div>
-          )}
-        </div>
+
+
 
     </div>
   );
