@@ -62,15 +62,32 @@ export default function MainMenu(props) {
                     try {
                         const list = await fetchJSON(`${API_PROJECTS}/${p.id}/tasks/`);
                         const tasksArr = Array.isArray(list?.results) ? list.results : list;
-                        return (tasksArr || []).map((t) => ({
-                            projectId: p.id,
-                            taskId: t.id,
-                            projectName: projMap.get(p.id) || `Project ${p.id}`,
-                            taskName: t.name,
-                            status: t.status,
-                            running_progress: t.running_progress || 0 // Add running_progress
-                        }));
+                        
+                        // Fetch the full detail for each task instantly
+                        const detailedTasksPromises = (tasksArr || []).map(async (t) => {
+                            try {
+                                const taskDetail = await fetchJSON(`${API_PROJECTS}/${p.id}/tasks/${t.id}/`);
+                                return {
+                                    projectId: p.id,
+                                    taskId: t.id,
+                                    projectName: projMap.get(p.id) || `Project ${p.id}`,
+                                    taskName: t.name,
+                                    status: taskDetail.status,
+                                    running_progress: taskDetail.running_progress || 0,
+                                    processing_time: taskDetail.processing_time || null, // CONSOLIDATED: Fetch processing_time here
+                                };
+                            } catch (e) {
+                                // Handles errors for individual task detail fetch
+                                console.warn("Fetch detailed task failed for task", t.id, e);
+                                return null;
+                            }
+                        });
+                        
+                        // Filter out failed detailed fetches
+                        return (await Promise.all(detailedTasksPromises)).filter(t => t !== null);
+
                     } catch (e) {
+                        // Handles errors for listing tasks in a project
                         console.warn("List tasks failed for project", p.id, e);
                         return [];
                     }
@@ -78,14 +95,17 @@ export default function MainMenu(props) {
             );
 
             const flatRefs = perProjectTaskRefs.flat();
-            // Include ALL tasks, not just non-completed ones
+            
             const shaped = flatRefs.map((task) => ({
                 id: task.taskId,
                 projectId: task.projectId,
                 projectName: task.projectName,
                 taskName: task.taskName,
-                progressPct: 0,
+                // Calculate progress and include all detail fields
+                progressPct: Math.round((task.running_progress || 0) * 100), 
                 status: task.status,
+                running_progress: task.running_progress || 0,
+                processing_time: task.processing_time, // CONSOLIDATED: Include processing_time
             }));
 
             setRunningTasks(shaped);
@@ -110,7 +130,6 @@ export default function MainMenu(props) {
                     // Check for a 404 status code directly
                     if (res.status === 404) {
                         console.warn(`Task ${task.id} not found (404), removing from list.`);
-                        // Return null to signal that this task should be removed from the list
                         return null;
                     }
     
@@ -126,15 +145,13 @@ export default function MainMenu(props) {
                         progressPct,
                         status: taskStatus,
                         running_progress: taskDetail.running_progress || 0,
-                        processing_time: taskDetail.processing_time || null
+                        processing_time: taskDetail.processing_time || null // IMPORTANT: Ensure processing_time is updated here too
                     };
                 } catch (e) {
-                    // This catch block handles network errors or JSON parsing errors, but not 404s
                     console.warn(`Progress update failed for task ${task.id}:`, e);
                     return {
                         ...task,
                         progressPct: 100,
-                        // Set status to failed (30) on other errors for clarity
                         status: 30
                     };
                 }
@@ -209,7 +226,7 @@ export default function MainMenu(props) {
     useEffect(() => {
         let interval;
         if (activeView === "tasks" && runningTasks.length > 0) {
-            interval = setInterval(updateRunningTasksProgress, 5000);
+            interval = setInterval(updateRunningTasksProgress, 1000);
         }
         return () => {
             if (interval) clearInterval(interval);

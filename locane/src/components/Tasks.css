@@ -99,7 +99,7 @@
 
 /* ====== TASK CONTENT ====== */
 .main-content-area {
-  display: flex;
+  display: flex; 
   flex-direction: column;
   flex-grow: 1;
 }
@@ -108,6 +108,7 @@
   display: none;
   min-width: 164px;
   flex-shrink: 0;
+  cursor: pointer;
 }
 .thumbnail-button {
   display: block;
