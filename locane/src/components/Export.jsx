@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import './Export.css';
 import { authorizedFetch } from '../utils/api.js';
 
-function Export({ projectId, taskId, onClose, openExportTaskId, setOpenExportTaskId }) {
+function Export({ projectId, taskId, onClose, openExportTaskId, setOpenExportTaskId, isSubscribed }) {
     const [assets, setAssets] = useState([]);
     const [loading, setLoading] = useState(true);
     const [dialogAsset, setDialogAsset] = useState(null);
@@ -320,6 +320,10 @@ function Export({ projectId, taskId, onClose, openExportTaskId, setOpenExportTas
 	const isDropdownVisible = openExportTaskId === taskId;
 
 	const toggleDropdown = () => {
+		if (!isSubscribed) {
+			alert('Subscription required');
+			return;
+		}
 		if (isDropdownVisible) {
 			setOpenExportTaskId(null);
 		} else {

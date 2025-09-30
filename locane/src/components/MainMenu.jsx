@@ -1,31 +1,28 @@
 import Sidebar from './Sidebar.jsx';
-import "./mainmenu.css"
+import "./mainmenu.css";
 import CreateNewTask from "./CreateTask.jsx";
-import React, {useCallback, useEffect, useState} from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Projects from "./Projects";
 import Tasks from "./Tasks";
 import GcpInterface from './GcpInterface.jsx';
 import NewProject from './NewProject.jsx';
-import Export from './Export.jsx'
+import Export from './Export.jsx';
 import { authorizedFetch } from '../utils/api.js';
 import Admin from './Admin.jsx';
-import { getCookie } from '../utils/cookieUtils';
-// logoutSession removed; using authorizedFetch directly
 
-export default function MainMenu(props) {
+export default function MainMenu({ setIsLogged, username, isSuperuser, setIsSuperuser, isSubscribed, setIsSubscribed }) {
     const [activeView, setActiveView] = useState("dash");
     const [projects, setProjects] = useState([]);
     const [loading, setLoading] = useState(false);
     const [runningTasks, setRunningTasks] = useState([]);
     const [exportTask, setExportTask] = useState(null);
     const [activeDialog, setActiveDialog] = useState("none");
-    const [isViewing,setViewing] = useState(false);
+    const [isViewing, setViewing] = useState(false);
     const [showLogoutDialog, setShowLogoutDialog] = useState(false);
 
     const [selectedTask, setSelectedTask] = useState(null);
     const [activeProjectId, setActiveProjectId] = useState(null);
     const [filterProjectId, setFilterProjectId] = useState(null);
-
 
     const API_BASE = "/api";
     const API_PROJECTS = `${API_BASE}/projects`;
@@ -47,8 +44,6 @@ export default function MainMenu(props) {
             setLoading(false);
         }
     }, [fetchJSON]);
-
-
 
     const loadRunningTasksStructure = useCallback(async () => {
         setLoading(true);
@@ -218,12 +213,17 @@ export default function MainMenu(props) {
 
 
     const onAddProject=()=>{
+        if (!isSubscribed) {
+            alert('Subscription required');
+            return;
+        }
         setActiveDialog("create-project");
-
-
     }
     const onAddTask=(projectId)=>{
-
+        if (!isSubscribed) {
+            alert('Subscription required');
+            return;
+        }
         setActiveProjectId(projectId);
         setActiveDialog("edit-task");
     }
@@ -268,15 +268,23 @@ export default function MainMenu(props) {
         await fetchProjects();
     };
 
+
+
     return (
         <div className="main-menu">
             <DialogueManager />
             <div className="sidebar-menu">
-                <Sidebar changeView={handleViewChange} setIsLogged={props.setIsLogged} activeView={activeView} setShowLogoutDialog={setShowLogoutDialog} />
+                <Sidebar
+                    changeView={handleViewChange}
+                    setIsLogged={setIsLogged}
+                    activeView={activeView}
+                    setShowLogoutDialog={setShowLogoutDialog}
+                    isSuperuser={isSuperuser} // Use prop passed from App.jsx
+                />
             </div>
             <div className="main-view">
                 {activeView === "dash" && <h1>Dashboard</h1>}
-                {activeView === "gcp" && <GcpInterface/>}
+                {activeView === "gcp" && <GcpInterface isSubscribed={isSubscribed} />}
                 {activeView === "proj" && (
                     <Projects
                         projects={projects}
@@ -289,6 +297,7 @@ export default function MainMenu(props) {
                         fetchProjects={fetchProjects}
                         changeView={handleViewChange}
                         refreshTasks={refreshTasks} // Pass refreshTasks to Projects
+                        isSubscribed={isSubscribed}
                     />
                 )}
                 {activeView === "tasks" && (
@@ -303,45 +312,53 @@ export default function MainMenu(props) {
                         filterProjectId={filterProjectId}
                         setFilterProjectId={setFilterProjectId}
                         projects={projects}
+                        isSubscribed={isSubscribed}
                     />
                 )}
-                {
-                    activeDialog === "edit-task" && (
-                        <div className="modal-overlay">
-                            <div className="dialog">
-                                <CreateNewTask
-                                    exit={() => { setActiveDialog("none"); setActiveProjectId(null); }}
-                                    redirect={setActiveView}
-                                    projectId={activeProjectId}
-                                    onTaskCreated={refreshTasks} // Pass refreshTasks to CreateNewTask
-                                />
-                            </div>
-                        </div>
-                    )
-                }
-                {
-                    activeDialog === "create-project" && (
-                        <div className="modal-overlay"  >
-                            <div className="dialog">
-                                <NewProject
-                                    onAddProject={async () => {
-                                        await fetchProjects();
-                                    }}
-                                    exit={() => { setActiveDialog("none") }}
-                                />
-                            </div>
-                        </div>
-                    )
-                }
-                {activeView === "admin" && <Admin changeView={handleViewChange} />}
+                {activeView === "admin" && (
+                    <Admin
+                        changeView={handleViewChange}
+                        isSuperuser={isSuperuser} // Use prop passed from App.jsx
+                        isSubscribed={isSubscribed} // Use prop passed from App.jsx
+                    />
+                )}
             </div>
+            {
+                activeDialog === "edit-task" && (
+                    <div className="modal-overlay">
+                        <div className="dialog">
+                            <CreateNewTask
+                                exit={() => { setActiveDialog("none"); setActiveProjectId(null); }}
+                                redirect={setActiveView}
+                                projectId={activeProjectId}
+                                onTaskCreated={refreshTasks} // Pass refreshTasks to CreateNewTask
+                            />
+                        </div>
+                    </div>
+                )
+            }
+            {
+                activeDialog === "create-project" && (
+                    <div className="modal-overlay"  >
+                        <div className="dialog">
+                            <NewProject
+                                onAddProject={async () => {
+                                    await fetchProjects();
+                                }}
+                                exit={() => { setActiveDialog("none") }}
+                            />
+                        </div>
+                    </div>
+                )
+            }
             {activeDialog === "export" && (
                 <div className="modal-overlay">
                     <div className="dialog">
                         <Export
-                            projectId={exportTask.projectId}
-                            taskId={exportTask.taskId}
+                            projectId={exportTask?.projectId}
+                            taskId={exportTask?.taskId}
                             onClose={() => setActiveDialog("none")} // Pass onClose prop
+                            isSubscribed={isSubscribed}
                         />
                     </div>
                 </div>
@@ -366,8 +383,7 @@ export default function MainMenu(props) {
                                     console.error('Logout failed', error);
                                 } finally {
                                     sessionStorage.removeItem('username');
-                                    props.setIsLogged(false);
-                                    navigate('/');
+                                    setIsLogged(false);
                                 }
                             }} className="logout-dialog-btn">Yes</button>
                             <button onClick={() => setShowLogoutDialog(false)} className="logout-dialog-btn no">No</button>

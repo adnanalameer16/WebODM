@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './admin.css'
 import { authorizedFetch } from '../utils/api';
 
-function Admin({ changeView }) {
+function Admin({ changeView, isSuperuser, isSubscribed }) {
     const [users, setUsers] = useState([]);
     const [showDeletePopup, setShowDeletePopup] = useState(false);
     const [showUserDialog, setShowUserDialog] = useState(false);
@@ -19,7 +19,7 @@ function Admin({ changeView }) {
         email: '',
         is_staff: false,
         is_active: false,
-        is_subscribed: true,
+        is_subscribed: false,
         groups: [],
         user_permissions: []
     });
@@ -38,8 +38,28 @@ function Admin({ changeView }) {
         try {
             const response = await authorizedFetch('/api/admin/users/');
             const data = await response.json();
-            console.log(data);
-            setUsers(data.results);
+            
+            // Fetch profile data for each user to get is_subscribed status
+            const usersWithProfiles = await Promise.all(
+                data.results.map(async (user) => {
+                    try {
+                        const profileResponse = await authorizedFetch(`/api/admin/profiles/${user.id}/`);
+                        const profileData = await profileResponse.json();
+                        return {
+                            ...user,
+                            is_subscribed: profileData.is_subscribed || false
+                        };
+                    } catch (error) {
+                        console.warn(`Failed to fetch profile for user ${user.id}:`, error);
+                        return {
+                            ...user,
+                            is_subscribed: false
+                        };
+                    }
+                })
+            );
+            
+            setUsers(usersWithProfiles);
         } catch (error) {
             console.error('Error fetching users:', error);
         }
@@ -56,21 +76,32 @@ function Admin({ changeView }) {
     };
 
     const handleSaveUser = async () => {
-        // Only check password confirmation for new users
         if (!currentUser && formData.password !== confirmPassword) {
             alert('Passwords do not match!');
             return;
         }
+
         try {
             const method = currentUser ? 'PUT' : 'POST';
             const url = currentUser ? `/api/admin/users/${currentUser.id}/` : '/api/admin/users/';
-            
-            // Send full formData (includes password as received from API for updates)
-            await authorizedFetch(url, {
+
+            // Save user data (create or update)
+            const response = await authorizedFetch(url, {
                 method,
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData),
             });
+
+            // Get the user ID (for new users, extract it from the response)
+            const userId = currentUser ? currentUser.id : (await response.json()).id;
+
+            // Update subscription status using the new endpoint
+            await authorizedFetch(`/api/admin/profiles/${userId}/update-subscription/`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ is_subscribed: formData.is_subscribed }),
+            });
+
             fetchUsers();
             closeUserDialog();
         } catch (error) {
@@ -91,7 +122,7 @@ function Admin({ changeView }) {
             email: user.email || '',
             is_staff: user.is_staff || false,
             is_active: user.is_active || false,
-            is_subscribed: user.is_subscribed !== undefined ? user.is_subscribed : true, 
+            is_subscribed: user.is_subscribed !== undefined ? user.is_subscribed : false, 
             groups: user.groups || [],
             user_permissions: user.user_permissions || []
         } : {
@@ -104,7 +135,7 @@ function Admin({ changeView }) {
             email: '',
             is_staff: false,
             is_active: false,
-            is_subscribed: true, 
+            is_subscribed: false, 
             groups: [],
             user_permissions: []
         };
@@ -173,6 +204,8 @@ function Admin({ changeView }) {
     return (
         <div className="admin">
             <h1>Admin Panel</h1>
+            {isSuperuser && <p>You are a superuser.</p>}
+            {isSubscribed && <p>You are subscribed.</p>}
             <button onClick={() => openUserDialog()}>Create User</button>
             <table>
                 <thead>

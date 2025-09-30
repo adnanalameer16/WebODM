@@ -15,7 +15,7 @@ const formatProcessingTime = (milliseconds) => {
 };
 
 // New TaskBox component with processing time functionality and second block's UI
-const TaskBox = ({ task, onAction, onShowDeleteDialog, fetchJSON, isDeleteDialogOpen = false, openExportTaskId, setOpenExportTaskId }) => {
+const TaskBox = ({ task, onAction, onShowDeleteDialog, fetchJSON, isDeleteDialogOpen = false, openExportTaskId, setOpenExportTaskId, isSubscribed }) => {
   const [lastError, setLastError] = useState(null);
   const [isHovering, setIsHovering] = useState(false);
   const [thumbnailUrl, setThumbnailUrl] = useState(null);
@@ -146,6 +146,7 @@ const TaskBox = ({ task, onAction, onShowDeleteDialog, fetchJSON, isDeleteDialog
                 taskId={task.id} 
                 openExportTaskId={openExportTaskId} 
                 setOpenExportTaskId={setOpenExportTaskId} 
+                isSubscribed={isSubscribed}
               />
               <button className="btn-delete" onClick={() => onShowDeleteDialog({ ...task, actionType: 'delete' })}>Delete</button>
             </>
@@ -181,7 +182,7 @@ const TaskBox = ({ task, onAction, onShowDeleteDialog, fetchJSON, isDeleteDialog
 };
 
 // Main Tasks component
-const Tasks = ({ runningTasks, loading, onRefresh, onTaskAction ,isViewing,exitView,selectedTask, filterProjectId, setFilterProjectId, projects }) => {
+const Tasks = ({ runningTasks, loading, onRefresh, onTaskAction ,isViewing,exitView,selectedTask, filterProjectId, setFilterProjectId, projects, isSubscribed }) => {
   const [deleteDialogTask, setDeleteDialogTask] = useState(null);
   const [filterProjectName, setFilterProjectName] = useState(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -291,6 +292,7 @@ const Tasks = ({ runningTasks, loading, onRefresh, onTaskAction ,isViewing,exitV
                       isDeleteDialogOpen={isDeleteDialogOpen}
                       openExportTaskId={openExportTaskId}
                       setOpenExportTaskId={setOpenExportTaskId}
+                      isSubscribed={isSubscribed}
                     />
                   ))}
                 </div>
@@ -310,6 +312,7 @@ const Tasks = ({ runningTasks, loading, onRefresh, onTaskAction ,isViewing,exitV
                       isDeleteDialogOpen={isDeleteDialogOpen}
                       openExportTaskId={openExportTaskId}
                       setOpenExportTaskId={setOpenExportTaskId}
+                      isSubscribed={isSubscribed}
                     />
                   ))}
                 </div>
@@ -329,6 +332,7 @@ const Tasks = ({ runningTasks, loading, onRefresh, onTaskAction ,isViewing,exitV
                       isDeleteDialogOpen={isDeleteDialogOpen}
                       openExportTaskId={openExportTaskId}
                       setOpenExportTaskId={setOpenExportTaskId}
+                      isSubscribed={isSubscribed}
                     />
                   ))}
                 </div>
@@ -348,6 +352,7 @@ const Tasks = ({ runningTasks, loading, onRefresh, onTaskAction ,isViewing,exitV
                       isDeleteDialogOpen={isDeleteDialogOpen}
                       openExportTaskId={openExportTaskId}
                       setOpenExportTaskId={setOpenExportTaskId}
+                      isSubscribed={isSubscribed}
                     />
                   ))}
                 </div>
@@ -366,8 +371,9 @@ const Tasks = ({ runningTasks, loading, onRefresh, onTaskAction ,isViewing,exitV
                       fetchJSON={memoizedAuthorizedFetch}
                       openExportTaskId={openExportTaskId}
                       setOpenExportTaskId={setOpenExportTaskId}
+                      isSubscribed={isSubscribed}
                     />
-                  ))}
+                  )) }
                 </div>
               </div>
             )}

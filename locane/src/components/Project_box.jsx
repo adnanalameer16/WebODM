@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import "./Project_box.css";
 import { authorizedFetch } from '../utils/api.js';
 
-const ProjectBox = ({ project, onAddTask, onEditProject, onShowDeleteDialog, changeView, refreshTasks }) => {
+const ProjectBox = ({ project, onAddTask, onEditProject, onShowDeleteDialog, changeView, refreshTasks, isSubscribed }) => {
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [editedName, setEditedName] = useState(project.name);
@@ -116,7 +116,13 @@ const ProjectBox = ({ project, onAddTask, onEditProject, onShowDeleteDialog, cha
       </div>
     
         <div className="project-actions-outer">
-          <div className="action-button add-task-btn" onClick={() => onAddTask(project.id)}>
+          <div className="action-button add-task-btn" onClick={() => {
+            if (!isSubscribed) {
+              alert('Subscription required');
+              return;
+            }
+            onAddTask(project.id);
+          }}>
             +
           </div>
           <div className="action-button delete-btn" onClick={() => onShowDeleteDialog(project)}>

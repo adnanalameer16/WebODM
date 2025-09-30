@@ -33,7 +33,7 @@ function distance2D(lat1, lon1, lat2, lon2) {
     return Math.sqrt(dLat * dLat + dLon * dLon);
 }
 
-function GcpInterface() {
+function GcpInterface({ isSubscribed }) {
     const [gcpPoints, setGcpPoints] = useState([]);
     const [images, setImages] = useState([]);
     const [showDirections, setShowDirections] = useState(false);
@@ -310,7 +310,13 @@ function GcpInterface() {
                             onChange={handleGcpFileChange}
                             style={{ display: 'none' }}
                         />
-                        <button onClick={() => gcpInputRef.current.click()}>
+                        <button onClick={() => {
+                            if (!isSubscribed) {
+                                alert('Subscription required');
+                                return;
+                            }
+                            gcpInputRef.current.click();
+                        }}>
                             Load existing Control Point File
                         </button>
                         <input
@@ -321,7 +327,13 @@ function GcpInterface() {
                             onChange={handleImageChange}
                             style={{ display: 'none' }}
                         />
-                        <button onClick={() => imageInputRef.current.click()}>
+                        <button onClick={() => {
+                            if (!isSubscribed) {
+                                alert('Subscription required');
+                                return;
+                            }
+                            imageInputRef.current.click();
+                        }}>
                             Choose images
                         </button>
                     </div>

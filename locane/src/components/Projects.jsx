@@ -3,7 +3,7 @@ import { authorizedFetch } from '../utils/api.js';
 import ProjectBox from './Project_box';
 import './Projects.css';
 
-const Projects = ({ projects, loading, onAddProject, onAddTask, onEditProject, fetchProjects, changeView }) => {
+const Projects = ({ projects, loading, onAddProject, onAddTask, onEditProject, fetchProjects, changeView, isSubscribed }) => {
   const [deleteDialogProject, setDeleteDialogProject] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -24,7 +24,13 @@ const Projects = ({ projects, loading, onAddProject, onAddTask, onEditProject, f
 
   return (
     <div className="projects-container">
-      <button className="add-button" onClick={onAddProject}>
+      <button className="add-button" onClick={() => {
+        if (!isSubscribed) {
+          alert('Subscription required');
+          return;
+        }
+        onAddProject();
+      }}>
         ➕ New Project
       </button>
       {loading ? (
@@ -39,6 +45,7 @@ const Projects = ({ projects, loading, onAddProject, onAddTask, onEditProject, f
               onEditProject={onEditProject}
               onShowDeleteDialog={setDeleteDialogProject}
               changeView={changeView}
+              isSubscribed={isSubscribed}
             />
           ))}
         </div>
