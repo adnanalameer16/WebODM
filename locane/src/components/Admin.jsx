@@ -204,8 +204,6 @@ function Admin({ changeView, isSuperuser }) {
     return (
         <div className="admin">
             <h1>Admin Panel</h1>
-            {isSuperuser && <p>You are a superuser.</p>}
-            {isSubscribed && <p>You are subscribed.</p>}
             <button onClick={() => openUserDialog()}>Create User</button>
             <table>
                 <thead>
