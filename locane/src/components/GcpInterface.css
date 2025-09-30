@@ -5,6 +5,7 @@
     --border-color: #dee2e6; 
     --button-bg: #e9ecef; 
     --button-hover-bg: #d4dae0; 
+    --blue-button: #4a90e2;
 } 
 
 /* --- GcpInterface.css Layout Styles --- */ 
@@ -53,9 +54,8 @@
     background: #e0f0ff;  
 } 
 
-/* --- Panel Headers (Linked Points & How to use) --- */ 
+/* --- Panel Headers (Linked Points) --- */ 
 .left-panel h4 { 
-    /* Resetting the default h4 styles for a cleaner look */ 
     color: var(--text-color);  
     font-size: 1.1em; 
     font-weight: 500; 
@@ -68,34 +68,18 @@
     margin-bottom: 20px; 
 } 
 
-.directions-section { 
-    margin-bottom: 20px; 
-} 
+/* Directions section is removed from here */ 
 
 .ui-match-header { 
-    cursor: pointer; 
+    cursor: auto; /* Not collapsible anymore in the left panel */
     user-select: none; 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center; 
+    display: block; /* Simpler header */
     border-bottom: 1px solid var(--border-color); /* Grey line below the header */ 
     padding-bottom: 8px; 
 } 
 
-.ui-match-header span { 
-    font-size: 0.8em; 
-    margin-left: 5px; 
-    color: #666; 
-} 
 
-.directions-section ol { 
-    font-size: 0.9em; 
-    color: #555; 
-    padding-left: 20px; 
-    margin-top: 5px; 
-} 
-
-/* --- Linked Points Mock UI (Blue Tiles - New Design) --- */ 
+/* --- Linked Points Mock UI (Blue Tiles) --- */ 
 
 .linked-points-mock-ui { 
     display: flex; 
@@ -111,21 +95,28 @@
 } 
 
 .mock-link-block { 
-    height: 20px; 
-    width: 90px; 
-    background-color: #4a90e2; /* Blue color for the blocks */ 
-    border-radius: 4px; 
+    height: 30px; /* Taller block */
+    width: 120px; /* Wider block */
+    background-color: var(--blue-button); /* Blue color for the blocks */ 
+    color: white;
+    border-radius: 8px; /* Rounded corners */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    font-size: 0.9em;
 } 
+
+.mock-link-block.right {
+    width: 60px; /* Smaller width for GCP ID */
+}
 
 .mock-link-line { 
     flex-grow: 1; 
     height: 2px; 
     background-color: #ccc; /* Grey line connecting the blocks */ 
-    margin: 0 8px; 
+    margin: 0 10px; 
 } 
-
-/* GcpInterface.css */
-/* GcpInterface.css */
 
 /* --- Linked Points List (Actual Data) --- */ 
 
@@ -136,48 +127,51 @@
     max-height: 200px; 
     overflow-y: auto; 
     border-radius: 4px; 
-    background-color: #f0f0f0;
+    /* background-color: #f0f0f0; - Removed background */
 } 
 
 .linked-points-list li { 
-    /* Set up for the two containers and the delete button */
     display: flex; 
     align-items: center; 
-    padding: 6px 12px;
+    padding: 8px 0; /* Padding adjustment */
     border-bottom: 1px solid var(--border-color);
-    
-    /* NEW: Use gap for spacing and make it a relative container for the line */
-    gap: 20px; 
+    gap: 10px; /* Tighter gap */
     position: relative;
+    justify-content: space-between; /* Space out elements */
 } 
 
 .linked-points-list li:last-child { 
     border-bottom: none; 
 } 
 
-/* Styles for the blue containers (blocks) */
-.linked-points-list li > .link-image-name,
-.linked-points-list li > .link-gcp-id {
-    background-color: #4a90e2; /* Matching the blue from the mockup */
+/* Styles for the blue button containers */
+.linked-points-list li > button {
+    background-color: var(--blue-button); 
     color: white;
-    border-radius: 4px;
+    border: none;
+    border-radius: 8px; /* Rounded corners */
     padding: 6px 10px; 
     text-align: center;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    font-weight: 500;
+    font-weight: bold;
     line-height: 1; 
-    
-    /* FIX: Enforce equal width */
-    flex: 1 1 0; /* flex-grow: 1, flex-shrink: 1, flex-basis: 0 ensures equal width */
-    min-width: 0; 
+    cursor: default;
+    height: 30px;
 }
 
-/* Remove margin and pseudo-element from .link-image-name to enable equal width */
-.linked-points-list li > .link-image-name {
-    /* margin-right: 20px; - REMOVED */
-    /* position: relative; - REMOVED */
+/* Specific widths for the two buttons to match the mock UI */
+.linked-points-list li > .link-image-name-btn {
+    width: 120px;
+    flex-shrink: 0;
+    margin-left: 0; /* Align to the left of the LI */
+}
+
+.linked-points-list li > .link-gcp-id-btn {
+    width: 60px;
+    flex-shrink: 0;
+    margin-right: 25px; /* Add margin to account for delete button and line space */
 }
 
 /* Creating the connecting line using a pseudo-element on the LI itself */
@@ -185,15 +179,15 @@
     content: '';
     position: absolute;
     top: 50%;
+    /* Start of the line: right edge of .link-image-name-btn + half the gap (5px) */
+    left: calc(120px + 5px); 
     
-    /* FIX: Position the line in the center of the 20px gap: 
-       Start position is half the LI width (50%), minus half the gap (10px), 
-       and minus half the line width (5px). */
-    left: calc(50% - 15px); 
-    
-    width: 10px; 
+    /* End of the line: left edge of .link-gcp-id-btn - half the gap (5px) */
+    width: calc(100% - 120px - 60px - 10px - 25px - 10px); /* Total width - fixed widths - gaps - delete button width/margin */
+    width: calc(100% - 120px - 60px - 45px); /* Simplified: 120 (img) + 60 (gcp) + 10 (gap) + 25 (margin) + 10 (delete btn area) = 225 */
+
     height: 2px;
-    background-color: #6c757d; /* Grey line color */
+    background-color: #6c757d00; /* Grey line color */
     transform: translateY(-50%);
     z-index: 2; 
 }
@@ -207,11 +201,8 @@
     font-size: 1.2em; 
     font-weight: bold; 
     padding: 0 5px; 
-    margin-left: 10px; 
-    flex-shrink: 0; /* Prevents button from shrinking */
-}
-.delete-link-btn:hover { 
-    color: #a71d2a; 
+    margin-left: auto; /* Push to the far right */
+    flex-shrink: 0; 
 }
 
 /* --- File Controls (Choose/Load Buttons) --- */ 
@@ -226,12 +217,13 @@
     flex: 1; 
     padding: 12px 10px; 
     border: none; 
-    border-radius: 4px; 
+    border-radius: 8px; /* Rounded corners */
     font-weight: bold; 
     color: white;  
-    background-color: #4a90e2; /* Blue color */ 
+    background-color: var(--blue-button); 
     transition: background-color 0.2s; 
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
+    text-transform: uppercase;
 } 
 
 .file-controls .ui-match-button:hover { 
@@ -240,17 +232,20 @@
 
 /* --- Image Grid (Real Images) --- */ 
 .image-grid { 
+    /* Changed to 2 columns */
     display: grid; 
-    grid-template-columns: repeat(3, minmax(100px, 1fr)); 
-    gap: 10px; 
+    grid-template-columns: repeat(2, minmax(0, 1fr)); 
+    gap: 15px; 
 } 
 
 .thumbnail { 
     position: relative; 
     border: 1px solid var(--border-color); 
-    padding: 4px; 
+    padding: 0; /* Remove padding */
     cursor: pointer; 
-    background-color: #fff; /* White background for image tile border */ 
+    background-color: #fff; 
+    border-radius: 8px; /* Rounded corners */
+    overflow: hidden; /* Important for rounding the image */
 } 
 
 .thumbnail img { 
@@ -259,30 +254,16 @@
     display: block; 
 } 
 
-/* Removed styles for .thumbnail.mock-thumbnail (grey tiles) */ 
-
 .thumbnail .image-name { 
     display: none; 
-    position: absolute; 
-    bottom: 4px; 
-    left: 4px; 
-    background: rgba(0,0,0,0.7); 
-    color: #fff; 
-    padding: 2px 6px; 
-    border-radius: 3px; 
-    font-size: 0.80em; 
-    z-index: 2; 
-} 
-
-.thumbnail:hover .image-name { 
-    display: block; 
 } 
 
 .thumbnail .delete-btn { 
+    /* Position inside the image, top right */
     position: absolute; 
-    top: -5px; 
-    right: -5px; 
-    background-color: red; 
+    top: 5px; 
+    right: 5px; 
+    background-color: rgba(255, 255, 255, 0); /* Semi-transparent red */
     color: white; 
     border: none; 
     border-radius: 50%; 
@@ -290,34 +271,34 @@
     height: 20px; 
     cursor: pointer; 
     font-weight: bold; 
-    line-height: 20px; 
+    line-height: 10px; /* Adjusted line height */
     text-align: center; 
-    opacity: 0.8; 
-} 
-
-.thumbnail .delete-btn:hover { 
-    opacity: 1; 
+    font-size: 1.2em;
+    padding: 0;
+    opacity: 1;
+    z-index: 5;
 } 
 
 .link-count-badge { 
+    /* Position inside the image, top left */
     position: absolute; 
-    top: -5px; 
-    left: -5px; 
-    background-color: #007bff; 
+    top: 5px; 
+    left: 5px; 
+    background-color: #e0f0ff00; 
     color: white; 
     border-radius: 50%; 
-    width: 20px; 
-    height: 20px; 
+    width: 25px; /* Slightly larger */
+    height: 25px; 
     display: flex; 
     justify-content: center; 
     align-items: center; 
-    font-size: 12px; 
+    font-size: 14px; 
     font-weight: bold; 
-    border: 1px solid white; 
-    z-index: 3; 
+    border: 2px solid white; /* White border */
+    z-index: 5; 
 } 
 
-/* --- Map Panel and Export Button --- */ 
+/* --- Map Panel, Export Button, and How To Use Overlay --- */ 
 
 .map-container.ui-match-map-container { 
     width: 100%; 
@@ -338,22 +319,74 @@
 .export-button.ui-match-export-button { 
     padding: 10px 20px; 
     border: none; 
-    border-radius: 4px; 
+    border-radius: 8px; 
     font-weight: bold; 
     color: white; 
-    background-color: #4a90e2;  
+    background-color: var(--blue-button);  
     transition: background-color 0.2s; 
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
     text-transform: uppercase;  
 } 
 
 .export-button.ui-match-export-button:hover:not(:disabled) { 
-    background-color: #357bd1; 
+    background-color: #0041cc; 
 } 
 
 .export-button.ui-match-export-button:disabled { 
-    background-color: #a0c4ec;  
+    background-color: #2a13d2;  
     color: #fff; 
     cursor: not-allowed; 
     border-color: #dee2e6; 
+}
+
+/* NEW: How to use Overlay */
+
+.how-to-use-overlay {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.how-to-use-toggle {
+    background-color: #003f88; /* Blue button */
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 1.5em;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    margin-bottom: 10px;
+}
+
+.how-to-use-content {
+    background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white box */
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 300px;
+    color: var(--text-color);
+    font-size: 0.9em;
+}
+
+.how-to-use-content h4 {
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+    font-size: 1.2em;
+}
+
+.how-to-use-content ol {
+    padding-left: 20px;
+    margin-top: 5px;
+}
+
+.how-to-use-content li {
+    margin-bottom: 5px;
 }

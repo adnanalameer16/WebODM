@@ -214,7 +214,7 @@ function GcpInterface() {
                 return timeB - timeA; 
             } 
             return images.indexOf(b) - images.indexOf(a); 
-        }); 
+        });
     } 
 
     const handleMapClick = () => { 
@@ -246,38 +246,24 @@ function GcpInterface() {
                     ) : ( 
                     <> 
                     <div className="gcp-list-section"> 
-                        {/* New Collapsible Header for Linked Points */} 
-                        <h4 onClick={() => {}} className="collapsible ui-match-header linked-points-header"> 
-                            Linked Points <span>▼</span> 
+                        {/* Linked Points Header (Non-collapsible to match image) */} 
+                        <h4 className="ui-match-header linked-points-header"> 
+                            Linked Points 
                         </h4> 
                          
                         {/* Mock UI/Empty state for Linked Points - Matches the blue tile design */} 
                         {gcpLinks.length === 0 ? ( 
                             <div className="linked-points-mock-ui"> 
-                                <div className="mock-link-row-ui"> 
-                                    <div className="mock-link-block left"></div> 
-                                    <div className="mock-link-line"></div> 
-                                    <div className="mock-link-block right"></div> 
-                                </div> 
-                                <div className="mock-link-row-ui"> 
-                                    <div className="mock-link-block left"></div> 
-                                    <div className="mock-link-line"></div> 
-                                    <div className="mock-link-block right"></div> 
-                                </div> 
-                                <div className="mock-link-row-ui"> 
-                                    <div className="mock-link-block left"></div> 
-                                    <div className="mock-link-line"></div> 
-                                    <div className="mock-link-block right"></div> 
-                                </div> 
                             </div> 
                         ) : ( 
                             // Actual linked points list 
                             <ul className="linked-points-list"> 
                                 {gcpLinks.map((link) => ( 
                                     <li key={link.id}> 
-                                        <span className="link-image-name">{link.image.name}</span>
-                                        {/* Separator span REMOVED. The line will be created in the gap below. */}
-                                        <span className="link-gcp-id">{link.gcp.id}</span>
+                                        {/* Name block - now a button for better UI match */}
+                                        <button className="link-image-name-btn">{link.image.name}</button>
+                                        {/* GCP block - now a button for better UI match */}
+                                        <button className="link-gcp-id-btn">{link.gcp.id}</button>
                                         <button  
                                             className="delete-link-btn"  
                                             onClick={() => setGcpLinks(links => links.filter(l => l.id !== link.id))} 
@@ -292,26 +278,8 @@ function GcpInterface() {
                      
                     {/* The GCP Points section is removed as requested by the user. */} 
                      
-                    <div className="directions-section"> 
-                        {/* Renamed to match the UI image */} 
-                        <h4 onClick={() => setShowHowToUse(!showHowToUse)} className="collapsible ui-match-header"> 
-                            How to use <span>{showHowToUse ? '▲' : '▼'}</span> 
-                        </h4> 
-                        {showHowToUse && ( 
-                        <> 
-                            <div style={{ marginBottom: "8px" }}> 
-                                Connect at least 5 high-contrast objects in 3 or more photos to their corresponding locations on the map. 
-                            </div> 
-                            <ol> 
-                                <li>Upload images (jpeg or png).</li> 
-                                <li>Set a point in an image.</li> 
-                                <li>Set a corresponding point on the map.</li> 
-                                <li>Repeat as desired (at least until the goal is achieved).</li> 
-                                <li>Generate the ground control point file.</li> 
-                            </ol> 
-                        </> 
-                        )} 
-                    </div> 
+                    {/* Directions section is removed from here */}
+                     
                     <div className="file-controls ui-match-controls"> 
                         <input 
                             type="file" 
@@ -321,7 +289,7 @@ function GcpInterface() {
                             onChange={handleImageChange} 
                             style={{ display: 'none' }} 
                         /> 
-                        <button className="ui-match-button" onClick={() => imageInputRef.current.click()}> 
+                        <button className="ui-match-button choose-images" onClick={() => imageInputRef.current.click()}> 
                             Choose Images 
                         </button> 
                         <input 
@@ -331,12 +299,12 @@ function GcpInterface() {
                             onChange={handleGcpFileChange} 
                             style={{ display: 'none' }} 
                         /> 
-                        <button className="ui-match-button" onClick={() => gcpInputRef.current.click()}> 
+                        <button className="ui-match-button load-gcp" onClick={() => gcpInputRef.current.click()}> 
                             Load GCP 
                         </button> 
                     </div> 
                     <div className="image-grid"> 
-                        {/* Only map real images. Mock tiles are removed as requested. */} 
+                        {/* Images in rows of two */}
                         {displayedImages.map((image, i) => { 
                             const linkCount = imageLinkCounts[image.url] || 0; 
                             return ( 
@@ -345,8 +313,9 @@ function GcpInterface() {
                                 setSelectedIndex(i); 
                             }}> 
                                 <img src={image.url} alt={image.name} /> 
-                                <span className="image-name">{image.name}</span> 
+                                {/* Link count badge is on top left */}
                                 <span className="link-count-badge">{linkCount}</span> 
+                                {/* Delete button is on top right */}
                                 <button className="delete-btn" onClick={(e) => handleRemoveImage(e, image.url)}> 
                                 X</button> 
                             </div> 
@@ -381,6 +350,28 @@ function GcpInterface() {
                         ))} 
                         <MapBoundsUpdater bounds={mapBounds} /> 
                          
+                        {/* How To Use Button/Overlay (New Position) */}
+                        <div className="how-to-use-overlay">
+                            <button className="how-to-use-toggle" onClick={() => setShowHowToUse(!showHowToUse)}>
+                                ?
+                            </button>
+                            {showHowToUse && (
+                                <div className="how-to-use-content">
+                                    <h4 style={{marginTop: 0}}>How to use</h4> 
+                                    <div style={{ marginBottom: "8px" }}> 
+                                        Connect at least 5 high-contrast objects in 3 or more photos to their corresponding locations on the map. 
+                                    </div> 
+                                    <ol> 
+                                        <li>Upload images (jpeg or png).</li> 
+                                        <li>Set a point in an image.</li> 
+                                        <li>Set a corresponding point on the map.</li> 
+                                        <li>Repeat as desired (at least until the goal is achieved).</li> 
+                                        <li>Generate the ground control point file.</li> 
+                                    </ol> 
+                                </div>
+                            )}
+                        </div>
+
                         {/* Export Button overlay, matching UI image placement */} 
                         <div className="export-button-overlay"> 
                             <button  
