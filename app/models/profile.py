@@ -13,6 +13,7 @@ from webodm import settings
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     quota = models.FloatField(default=-1, blank=True, help_text=_("Maximum disk quota in megabytes"), verbose_name=_("Quota"))
+    is_subscribed = models.BooleanField(default=False, help_text=_("Whether this user has an active subscription"), verbose_name=_("Is Subscribed"))
 
     def has_quota(self):
         return self.quota != -1

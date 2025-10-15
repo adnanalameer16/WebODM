@@ -18,34 +18,8 @@ import adminSelected from '../assets/admin_sidebar_selected.png';
 import adminUnselected from '../assets/admin_sidebar_unselected.png';
 import logoutIcon from '../assets/logout_sidebar.png';
 
-function Sidebar({ changeView, activeView, setShowLogoutDialog }) {
-    const [isSuperuser, setIsSuperuser] = useState(false);
+function Sidebar({ changeView, activeView, setShowLogoutDialog, isSuperuser }) {
     const [isCollapsed, setIsCollapsed] = useState(false);
-    const navigate = useNavigate();
-
-    useEffect(() => {
-        // First try to get from sessionStorage (existing functionality)
-        const sessionSuperuser = sessionStorage.getItem('is_superuser') === 'true';
-        setIsSuperuser(sessionSuperuser);
-
-        // Then fetch user details for more accurate info
-        const fetchUserDetails = async () => {
-            try {
-                const response = await authorizedFetch('/api/admin/users/'); 
-                const data = await response.json();
-                if (data && data.results && data.results.length > 0) {
-                    const currentUser = data.results.find(user => user.username === sessionStorage.getItem('username'));
-                    setIsSuperuser(currentUser?.is_superuser || sessionSuperuser);
-                }
-            } catch (error) {
-                console.error('Error fetching user details:', error);
-                // Fall back to sessionStorage value if fetch fails
-                setIsSuperuser(sessionSuperuser);
-            }
-        };
-
-        fetchUserDetails();
-    }, []);
 
     const doDashboard = () => changeView("dash");
     const doProjects = () => changeView("proj");
@@ -57,7 +31,7 @@ function Sidebar({ changeView, activeView, setShowLogoutDialog }) {
         setIsCollapsed(!isCollapsed);
     };
 
-    return(
+    return (
         <div className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
             <div className="sidebar-header">
                 <button className="hamburger-btn" onClick={toggleSidebar}>
@@ -96,9 +70,8 @@ function Sidebar({ changeView, activeView, setShowLogoutDialog }) {
             <button onClick={() => setShowLogoutDialog(true)} className="sidebar-logout">
                 <img src={logoutIcon} alt="Logout" />
             </button>
-            <div className="sidebar-empty-space"></div>
         </div>
-
     );
 }
+
 export default Sidebar;

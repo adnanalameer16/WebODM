@@ -3,7 +3,7 @@ import "./Login.css";
 import { getCookie } from "../utils/cookieUtils";
 import { authorizedFetch } from "../utils/api";
 
-function Login({ setIsLogged }) {
+function Login({ setIsLogged, setUserDetails }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -54,40 +54,48 @@ function Login({ setIsLogged }) {
         credentials: "include",
       });
 
-      let data = null;
-      try {
-        data = await response.json();
-      } catch (_) {
-        // Fallback to text for debugging
-        const txt = await response.text();
-        console.error("Non-JSON login response", txt);
-      }
+      const data = await response.json();
 
       if (response.ok && data && data.ok) {
-        sessionStorage.setItem("username", data.username || username);
-        sessionStorage.setItem("is_superuser", false); // Default to false
+        // Fetch superuser and subscription status
+        const userDetails = { username: data.username || username, is_superuser: false, is_subscribed: false };
 
-        // Verify superuser status
         try {
+          // Check if the user is a superuser
           const adminResponse = await authorizedFetch("/api/admin/users/");
-          if (adminResponse.ok) {
-            sessionStorage.setItem("is_superuser", true);
-          }
-        } catch (adminError) {
-          console.warn("Admin check failed, defaulting to non-superuser:", adminError);
+          const adminData = await adminResponse.json();
+          const currentUser = adminData.results.find((user) => user.username === userDetails.username);
+          userDetails.is_superuser = currentUser?.is_superuser || false;
+        } catch (error) {
+          console.warn("Failed to fetch superuser status:", error);
         }
 
+        try {
+          // Check subscription status
+          const subscriptionResponse = await authorizedFetch("/api/users/subscription-status");
+          const subscriptionData = await subscriptionResponse.json();
+          userDetails.is_subscribed = subscriptionData.is_subscribed || false;
+        } catch (error) {
+          console.warn("Failed to fetch subscription status:", error);
+        }
+
+
+        sessionStorage.setItem("username", userDetails.username);
+
+        // Pass user details to parent component
+        setUserDetails(userDetails);
         setIsLogged(true);
       } else {
-        const msg = (data && data.error) ? data.error : `HTTP ${response.status}`;
-        console.error("Login failed", msg, data);
+        const msg = data?.error || `HTTP ${response.status}`;
+        console.error("Login failed:", msg);
         alert("Login failed: " + msg);
       }
     } catch (error) {
       console.error("An error occurred during login:", error);
       alert("An error occurred. Please try again later.");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
