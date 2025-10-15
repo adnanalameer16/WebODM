@@ -7,6 +7,7 @@ import './GcpInterface.css';
 import ImageViewer from "./ImageViewer";
 import { useNavigate } from "react-router-dom";
 import Login from './Login';
+import { authorizedFetch } from '../utils/api.js';
 
 const MapBoundsUpdater = ({ bounds }) => {
     const map = useMap();
@@ -46,6 +47,18 @@ function GcpInterface() {
     const gcpInputRef = useRef(null);
     const imageInputRef = useRef(null);
     const navigate = useNavigate();
+
+    // Helper function for real-time subscription check
+    const checkSubscriptionStatus = async () => {
+        try {
+            const response = await authorizedFetch('/api/users/subscription-status');
+            const data = await response.json();
+            return data.is_subscribed || false;
+        } catch (error) {
+            console.error('Failed to check subscription status:', error);
+            return false;
+        }
+    };
 
     const handleRemoveImage = (e, imageUrlToRemove) => {
         e.stopPropagation();
@@ -310,7 +323,14 @@ function GcpInterface() {
                             onChange={handleGcpFileChange}
                             style={{ display: 'none' }}
                         />
-                        <button onClick={() => gcpInputRef.current.click()}>
+                        <button onClick={async () => {
+                            const isCurrentlySubscribed = await checkSubscriptionStatus();
+                            if (!isCurrentlySubscribed) {
+                                alert('Subscription required');
+                                return;
+                            }
+                            gcpInputRef.current.click();
+                        }}>
                             Load existing Control Point File
                         </button>
                         <input
@@ -321,7 +341,14 @@ function GcpInterface() {
                             onChange={handleImageChange}
                             style={{ display: 'none' }}
                         />
-                        <button onClick={() => imageInputRef.current.click()}>
+                        <button onClick={async () => {
+                            const isCurrentlySubscribed = await checkSubscriptionStatus();
+                            if (!isCurrentlySubscribed) {
+                                alert('Subscription required');
+                                return;
+                            }
+                            imageInputRef.current.click();
+                        }}>
                             Choose images
                         </button>
                     </div>

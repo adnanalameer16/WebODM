@@ -145,7 +145,7 @@ const TaskBox = ({ task, onAction, onShowDeleteDialog, fetchJSON, isDeleteDialog
                 projectId={task.projectId} 
                 taskId={task.id} 
                 openExportTaskId={openExportTaskId} 
-                setOpenExportTaskId={setOpenExportTaskId} 
+                setOpenExportTaskId={setOpenExportTaskId}
               />
               <button className="btn-delete" onClick={() => onShowDeleteDialog({ ...task, actionType: 'delete' })}>Delete</button>
             </>
@@ -367,7 +367,7 @@ const Tasks = ({ runningTasks, loading, onRefresh, onTaskAction ,isViewing,exitV
                       openExportTaskId={openExportTaskId}
                       setOpenExportTaskId={setOpenExportTaskId}
                     />
-                  ))}
+                  )) }
                 </div>
               </div>
             )}

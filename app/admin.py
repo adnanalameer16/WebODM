@@ -268,14 +268,14 @@ class ProfileInline(admin.StackedInline):
     model = Profile
     can_delete = False
 
-    # Hide "quota" profile field when adding (show during editing)
+    # Modified to include is_subscribed field
     def get_fields(self, request, obj=None):
         if obj is None:
             fields = list(super().get_fields(request, obj))
             fields.remove('quota')
-            return fields
+            return fields + ['is_subscribed']
         else:
-            return super().get_fields(request, obj)
+            return super().get_fields(request, obj) + ['is_subscribed']
 
 class UserAdmin(BaseUserAdmin):
     inlines = [ProfileInline]

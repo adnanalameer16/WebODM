@@ -81,6 +81,25 @@ class AdminProfileViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return Profile.objects.all()
 
+    @action(detail=True, methods=['patch'], url_path='update-subscription')
+    def update_subscription(self, request, user=None):
+        """
+        Allows admin to update the subscription status of a user.
+        """
+        try:
+            profile = self.get_object()
+            is_subscribed = request.data.get('is_subscribed', None)
+
+            if is_subscribed is None:
+                return Response({"error": "is_subscribed field is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+            profile.is_subscribed = is_subscribed
+            profile.save()
+
+            return Response({"message": "Subscription status updated successfully.", "is_subscribed": profile.is_subscribed}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
     
     @action(detail=True, methods=['post'])
     def update_quota_deadline(self, request, user=None):
