@@ -1,13 +1,13 @@
-import React, { useState, useRef, useEffect } from "react";
-import { MapContainer, TileLayer, Marker, Tooltip, useMap, useMapEvents } from "react-leaflet";
-import '../leafletConfig.js'; // Configure Leaflet icons
-import exifr from 'exifr';
-import proj4 from 'proj4';
-import './GcpInterface.css';
-import ImageViewer from "./ImageViewer";
-import { useNavigate } from "react-router-dom";
-import Login from './Login';
-import { authorizedFetch } from '../utils/api.js';
+import React, { useState, useRef, useEffect } from "react"; 
+import { MapContainer, TileLayer, Marker, Tooltip, useMap, useMapEvents } from "react-leaflet"; 
+import '../leafletConfig.js'; // Configure Leaflet icons 
+import exifr from 'exifr'; 
+import proj4 from 'proj4'; 
+import './GcpInterface.css'; 
+import ImageViewer from "./ImageViewer"; 
+import { useNavigate } from "react-router-dom"; 
+import Login from './Login'; 
+import { authorizedFetch } from '../utils/api.js'; 
 
 const MapBoundsUpdater = ({ bounds }) => { 
     const map = useMap(); 
@@ -48,6 +48,7 @@ function GcpInterface() {
     const gcpInputRef = useRef(null); 
     const imageInputRef = useRef(null); 
     const navigate = useNavigate(); 
+
     // Helper function for real-time subscription check
     const checkSubscriptionStatus = async () => {
         try {
@@ -60,12 +61,7 @@ function GcpInterface() {
         }
     };
 
-    const handleRemoveImage = (e, imageUrlToRemove) => {
-        e.stopPropagation();
-        setImages(currentImages => currentImages.filter(img => img.url !== imageUrlToRemove));
-        setGcpLinks(currentLinks => currentLinks.filter(link => link.image.url !== imageUrlToRemove));
-    };
-
+    // --- Handlers (unchanged logic) --- 
 
     const handleRemoveImage = (e, imageUrlToRemove) => { 
         e.stopPropagation(); 
@@ -306,7 +302,14 @@ function GcpInterface() {
                             onChange={handleImageChange} 
                             style={{ display: 'none' }} 
                         /> 
-                        <button className="ui-match-button choose-images" onClick={() => imageInputRef.current.click()}> 
+                        <button className="ui-match-button choose-images" onClick={async () => {
+                            const isCurrentlySubscribed = await checkSubscriptionStatus();
+                            if (!isCurrentlySubscribed) {
+                                alert('Subscription required');
+                                return;
+                            }
+                            imageInputRef.current.click();
+                        }}> 
                             Choose Images 
                         </button> 
                         <input 
@@ -316,7 +319,14 @@ function GcpInterface() {
                             onChange={handleGcpFileChange} 
                             style={{ display: 'none' }} 
                         /> 
-                        <button className="ui-match-button load-gcp" onClick={() => gcpInputRef.current.click()}> 
+                        <button className="ui-match-button load-gcp" onClick={async () => {
+                            const isCurrentlySubscribed = await checkSubscriptionStatus();
+                            if (!isCurrentlySubscribed) {
+                                alert('Subscription required');
+                                return;
+                            }
+                            gcpInputRef.current.click();
+                        }}> 
                             Load GCP 
                         </button> 
                     </div> 
@@ -388,166 +398,23 @@ function GcpInterface() {
                                 </div>
                             )}
                         </div>
-    return (
-        <div className="gcp-window">
-            <div className="top-bar">
-                <div className="top-bar-left">
-                    <div className="title">
-                        Ground Control Point Interface
-                    </div>
-                </div>
-                <div className="top-bar-right">
-                    <button 
-                        className="export-button" 
-                        onClick={handleExport}
-                        disabled={gcpLinks.length === 0}
-                    >
-                        EXPORT FILE
-                    </button>
-                </div>
-            </div>
-            <div className="main-content">
-                <div className="left-panel">
-                    {selectedImage ? (
-                        <ImageViewer
-                            image={selectedImage}
-                            index={selectedIndex}
-                            onClose={closeImageViewer}
-                            onPointSelect={handleImagePointSelect}
-                            onPointDelete={handleImagePointDelete}
-                            hasPendingPoint={!!pendingPoint}
-                        />
-                    ) : (
-                    <>
-                    <div className="gcp-list-section">
-                        <h4>LINKED POINTS ({gcpLinks.length})</h4>
-                        {gcpLinks.length === 0 ? (
-                            <p className="no-points">No links created yet...</p>
-                        ) : (
-                            <ul className="linked-points-list">
-                                {gcpLinks.map((link) => (
-                                    <li key={link.id}>
-                                        <span> {link.image.name} ↔️  {link.gcp.id}</span>
-                                        <button 
-                                            className="delete-link-btn" 
-                                            onClick={() => setGcpLinks(links => links.filter(l => l.id !== link.id))}
-                                        >
-                                            ✖
-                                        </button>
-                                    </li>
-                                ))}
-                            </ul>
-                        )}
-                    </div>
-                    <div className="gcp-list-section">
-                        <h4>GROUND CONTROL POINTS</h4>
-                        {gcpPoints.length === 0 ? (
-                            <p className="no-points">No points...</p>
-                        ) : (
-                            <ul>
-                                {gcpPoints.map((p, i) => <li key={i}>{p.id}</li>)}
-                            </ul>
-                        )}
-                    </div>
-                    <div className="directions-section">
-                        <h4 onClick={() => setShowDirections(!showDirections)} className="collapsible">
-                           {showDirections ? '▼' : '►'} DIRECTIONS
-                        </h4>
-                        {showDirections && (
-                        <>
-                            <div style={{ marginBottom: "8px" }}>
-                                Connect at least 5 high-contrast objects in 3 or more photos to their corresponding locations on the map.
+
+                        {/* Export Button overlay, matching UI image placement */} 
+                        {gcpLinks.length > 0 && (
+                            <div className="export-button-overlay"> 
+                                <button  
+                                    className="export-button ui-match-export-button"  
+                                    onClick={handleExport} 
+                                > 
+                                    Export File 
+                                </button> 
                             </div>
-                            <ol>
-                                <li>Upload images (jpeg or png).</li>
-                                <li>Set a point in an image.</li>
-                                <li>Set a corresponding point on the map.</li>
-                                <li>Repeat as desired (at least until the goal is achieved).</li>
-                                <li>Generate the ground control point file.</li>
-                            </ol>
-                        </>
-                        )}
-                    </div>
-                    <div className="file-controls">
-                        <input
-                            type="file"
-                            accept=".txt"
-                            ref={gcpInputRef}
-                            onChange={handleGcpFileChange}
-                            style={{ display: 'none' }}
-                        />
-                        <button onClick={async () => {
-                            const isCurrentlySubscribed = await checkSubscriptionStatus();
-                            if (!isCurrentlySubscribed) {
-                                alert('Subscription required');
-                                return;
-                            }
-                            gcpInputRef.current.click();
-                        }}>
-                            Load existing Control Point File
-                        </button>
-                        <input
-                            type="file"
-                            accept="image/jpeg, image/png"
-                            multiple
-                            ref={imageInputRef}
-                            onChange={handleImageChange}
-                            style={{ display: 'none' }}
-                        />
-                        <button onClick={async () => {
-                            const isCurrentlySubscribed = await checkSubscriptionStatus();
-                            if (!isCurrentlySubscribed) {
-                                alert('Subscription required');
-                                return;
-                            }
-                            imageInputRef.current.click();
-                        }}>
-                            Choose images
-                        </button>
-                    </div>
-                    <div className="image-grid">
-                        {displayedImages.map((image, i) => {
-                            const linkCount = imageLinkCounts[image.url] || 0;
-                            return (
-                            <div key={image.url} className="thumbnail" onClick={() => {
-                                setSelectedImage(image); 
-                                setSelectedIndex(i);
-                            }}>
-                                <img src={image.url} alt={image.name} />
-                                <span className="image-name">{image.name}</span>
-                                <span className="link-count-badge">{linkCount}</span>
-                                <button className="delete-btn" onClick={(e) => handleRemoveImage(e, image.url)}>
-                                X</button>
-                            </div>
-                        )})}
-                    </div>
-                    </>
-                    )}
-                </div>
-                <div className="right-panel">
-                    <MapContainer center={[20, 0]} zoom={2} className="map-container" style={{cursor: pendingPoint ? 'crosshair' : 'auto'}}>
-                        <MapClickHandler onMapClick={handleMapClick} />
-                        <TileLayer
-                            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                        />
-                        {gcpPoints.map((point) => (
-                            <Marker 
-                                key={point.id} 
-                                position={[point.lat, point.lon]} 
-                                eventHandlers={{ click: () => handleGcpMarkerClick(point) }}
-                            >
-                                <Tooltip direction="top" offset={[0, -10]} opacity={1} permanent={false}>
-                                    {point.id}
-                                </Tooltip>
-                            </Marker>
-                        ))}
-                        <MapBoundsUpdater bounds={mapBounds} />
-                    </MapContainer>
-                </div>
-            </div>
-        </div>
-    );
-}
+                        )} 
+                    </MapContainer> 
+                </div> 
+            </div> 
+        </div> 
+    ); 
+} 
 
 export default GcpInterface;
