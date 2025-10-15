@@ -2,17 +2,32 @@ import React, { useState, useRef } from 'react';
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import "./ImageViewer.css";
 
+// ====================================================================
+// START: ACTUAL MUI ICON IMPORTS (Required for a real MUI setup)
+// ====================================================================
+import CloseIcon from '@mui/icons-material/Close';
+import DeleteIcon from '@mui/icons-material/Delete';
+import ZoomInIcon from '@mui/icons-material/ZoomIn';
+import ZoomOutIcon from '@mui/icons-material/ZoomOut';
+import RestoreIcon from '@mui/icons-material/Restore';
+import LocationSearchingIcon from '@mui/icons-material/LocationSearching'; // Used for the target/select icon
+import NearMeDisabledIcon from '@mui/icons-material/NearMeDisabled'; // Used for cancelling selection
+import CheckCircleIcon from '@mui/icons-material/CheckCircle'; // Used when point is set
+// ====================================================================
+// END: ACTUAL MUI ICON IMPORTS
+// ====================================================================
+
+
 function ImageViewer({ image, index, onClose, onPointSelect, onPointDelete, hasPendingPoint }) {
   const [imagePoint, setImagePoint] = useState(null);
   const [isSelecting, setIsSelecting] = useState(false);
-  // We no longer need the 'transform' state, as we'll get live data from the render prop.
-  // const [transform, setTransform] = useState({ scale: 1, positionX: 0, positionY: 0 }); 
   const imageRef = useRef(null);
 
-  // handleSelectClick, handleImageClick, and handleDeletePoint remain the same as before.
   const handleSelectClick = () => {
-    if (!imagePoint) {
-      setIsSelecting(true);
+    if (!imagePoint && !hasPendingPoint) {
+      setIsSelecting(prev => !prev); 
+    } else if (isSelecting) {
+      setIsSelecting(false);
     }
   };
 
@@ -49,9 +64,8 @@ function ImageViewer({ image, index, onClose, onPointSelect, onPointDelete, hasP
     onPointDelete();
   };
 
-
   return (
-    <div className="image-viewer no-scroll">
+    <div className="image-viewer professional-viewer themed-viewer">
       <TransformWrapper
         minScale={1}
         maxScale={50}
@@ -66,26 +80,81 @@ function ImageViewer({ image, index, onClose, onPointSelect, onPointDelete, hasP
             ? {
                 left: `${(imagePoint.x / imageRef.current.naturalWidth) * 100}%`,
                 top: `${(imagePoint.y / imageRef.current.naturalHeight) * 100}%`,
-                transform: `translate(-50%, -50%) scale(${1 / currentScale})`,
+                transform: `translate(-50%, -50%) scale(${1 / currentScale})`, 
               }
             : {};
-
+            
+          // Marker class is now simplified, always applying 'image-marker' style when a point exists
+          const markerClass = imagePoint ? 'image-marker' : '';
+            
+          const SelectIconComponent = isSelecting 
+            ? NearMeDisabledIcon
+            : (imagePoint 
+                ? CheckCircleIcon
+                : LocationSearchingIcon
+              );
+          
+          const isSelectDisabled = !!imagePoint || hasPendingPoint;
+          
           return (
-            <>
-              <div className="viewer-header">
-                <div className="viewer-title">{image.name} (#{index})</div>
-                <div className="viewer-controls-row">
-                  <button onClick={handleSelectClick} disabled={isSelecting || !!imagePoint || hasPendingPoint}>
-                    {isSelecting ? "Click on Image..." : "Select Point"}
-                  </button>
-                  <button onClick={() => zoomIn()}>＋</button>
-                  <button onClick={() => zoomOut()}>－</button>
-                  <button onClick={() => resetTransform()}>Reset</button>
-                  <button className="close-btn" onClick={onClose}>✖ Close</button>
+            <div className="viewer-content-container">
+              
+              {/* === 1. Title and Close Button Bar === */}
+              <div className="viewer-top-title-bar">
+                <div className="viewer-title">
+                  {image.name} (#{index})
                 </div>
+                {/* Close Button on the far right, matching the square style */}
+                <button className="close-btn-header" onClick={onClose} title="Close Viewer">
+                  <CloseIcon sx={{ fontSize: 28 }} />
+                </button>
               </div>
 
-              <div className="viewer-body" onClick={handleImageClick} style={{ cursor: isSelecting ? 'crosshair' : 'default' }}>
+              {/* === 2. Control Buttons Bar === */}
+              <div className="viewer-controls-row">
+                    
+                {/* Select Point Button (Target Icon) */}
+                <button 
+                  className={`icon-button primary-icon ${isSelecting ? 'active' : ''}`} 
+                  onClick={handleSelectClick} 
+                  disabled={isSelectDisabled && !isSelecting}
+                  title={isSelecting ? "Cancel Selection" : (imagePoint ? "Point Set" : "Select Point")}
+                >
+                  <SelectIconComponent sx={{ fontSize: 30 }} />
+                </button>
+                
+                {/* Zoom In Button */}
+                <button className="icon-button" onClick={() => zoomIn()} title="Zoom In">
+                  <ZoomInIcon sx={{ fontSize: 30 }} />
+                </button>
+                
+                {/* Zoom Out Button */}
+                <button className="icon-button" onClick={() => zoomOut()} title="Zoom Out">
+                  <ZoomOutIcon sx={{ fontSize: 30 }} />
+                </button>
+                
+                {/* Reset Button */}
+                <button className="icon-button" onClick={() => resetTransform()} title="Reset Zoom/Pan">
+                  <RestoreIcon sx={{ fontSize: 30 }} />
+                </button>
+
+                {/* Delete Point Button */}
+                <button 
+                  className="icon-button delete-icon" 
+                  onClick={handleDeletePoint} 
+                  disabled={!imagePoint}
+                  title="Delete Current Point"
+                >
+                  <DeleteIcon sx={{ fontSize: 30 }} />
+                </button>
+              </div>
+
+              {/* === 3. Image Body === */}
+              <div 
+                className="viewer-body" 
+                onClick={handleImageClick} 
+                style={{ cursor: isSelecting ? 'crosshair' : (currentScale > 1 ? 'grab' : 'default') }}
+              >
                 <TransformComponent
                     wrapperStyle={{ width: "100%", height: "100%" }}
                     contentStyle={{ width: "100%", height: "100%" }}
@@ -97,28 +166,38 @@ function ImageViewer({ image, index, onClose, onPointSelect, onPointDelete, hasP
                             src={image.url}
                             alt={image.name}
                             className="zoom-image"
-                            style={{ cursor: isSelecting ? 'crosshair' : 'grab' }}
+                            style={{ cursor: isSelecting ? 'crosshair' : (currentScale > 1 ? 'grab' : 'default') }}
                           />
+                          {/* SIMPLIFIED MARKER: Only the main marker div exists */}
                           {imagePoint && (
-                              <div className="image-marker" style={markerStyle}>
-                                  <div className="marker-delete-btn" onClick={handleDeletePoint}>✖</div>
+                              <div 
+                                className={markerClass} 
+                                style={markerStyle} 
+                                title="Selected Point"
+                              >
                               </div>
                           )}
                       </div>
                   </div>
                 </TransformComponent>
               </div>
-              {hasPendingPoint && !imagePoint && (
-                  <div className="viewer-footer-notice">
-                      A point is pending. Close and reopen to select a new point in this image.
+              
+              {/* Footer Notices */}
+              {(hasPendingPoint || imagePoint) && (
+                  <div className="viewer-footer">
+                      {hasPendingPoint && !imagePoint && (
+                          <div className="viewer-footer-notice warning-notice">
+                              A ground control point is pending selection on the map.
+                          </div>
+                      )}
+                      {imagePoint && hasPendingPoint && (
+                          <div className="viewer-footer-notice success-notice">
+                              Point selected. **Select the corresponding GCP on the map** to link them.
+                          </div>
+                      )}
                   </div>
               )}
-              {imagePoint && hasPendingPoint && (
-                  <div className="viewer-footer-notice">
-                      Select the corresponding GCP on the map.
-                  </div>
-              )}
-            </>
+            </div>
           );
         }}
       </TransformWrapper>

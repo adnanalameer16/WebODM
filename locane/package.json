@@ -11,6 +11,10 @@
     "build:production": "vite build --mode production"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/icons-material": "^7.3.2",
+    "@mui/material": "^7.3.2",
     "axios": "^1.12.2",
     "color-interpolate": "^2.0.0",
     "exifr": "^7.1.3",
