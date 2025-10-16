@@ -1,5 +1,5 @@
 .description textarea{
-    width: 70%;
+    width: 95%;
     margin-bottom: 1.25rem;
     padding: 0.9rem;
     border: 2px solid #e2e8f0;
@@ -10,22 +10,35 @@
 
 
 }
+.project-container{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    padding: 1rem;
+    box-sizing: border-box;
+    gap: 1rem;
+}
+.title{
+    margin:0;
+}
 .card-header{
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: flex-start;
+    column-gap: 1.5rem;
 
 
 
  }
  .projectName{
      height: 50px;
-     width: fit-content;
+     width: 400px;
      font-size: xx-large;
 
-     margin-bottom: 1.25rem;
-     padding: 0.9rem;
+
+
      border: 2px solid #e2e8f0;
      border-radius: 8px;
 
@@ -45,7 +58,8 @@
     transition: all 0.2s ease;
     font-size: 1rem;
     background: rgba(0, 123, 255, 0) !important;
-    color: white;
+    color: #000000;
+
 
 
 
@@ -57,17 +71,26 @@
     border-color: rgba(0, 0, 0, 0.18) !important;
 }
 .cancel-button {
-    padding: 0.85rem 1.75rem;
+
     border: none;
     border-radius: 8px;
     cursor: pointer;
     font-weight: bold;
     transition: all 0.2s ease;
     font-size: 1rem;
-    background: #a6a6a6;
+    background: rgba(135, 135, 135, 0.17) !important;
     color: white;
+    height: 100%;
+    margin: 0 !important;
+    padding: 0.85rem 1.75rem !important;
+    margin-right: 10px !important;
 }
+.cancel-button:hover {
 
+    background: rgba(135, 135, 135, 0.37) !important;
+    transition: border-color 0.2s ease;
+    border-color: rgba(0, 0, 0, 0.18) !important;
+}
 
 
  .tags{

@@ -324,7 +324,7 @@ export default function MainMenu(props) {
                 {
                     activeDialog === "create-project" && (
                         <div className="modal-overlay"  >
-                            <div className="dialog">
+                            <div className="dialog no-close">
                                 <NewProject
                                     onAddProject={async () => {
                                         await fetchProjects();
