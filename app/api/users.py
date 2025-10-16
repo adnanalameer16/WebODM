@@ -29,5 +29,5 @@ class UserSubscriptionStatus(APIView):
     
     def get(self, request):
         user = request.user
-        is_subscribed = hasattr(user, 'profile') and user.profile.is_subscribed
+        is_subscribed = hasattr(user, 'profile') and user.profile.is_subscription_active()
         return Response({'is_subscribed': is_subscribed})
