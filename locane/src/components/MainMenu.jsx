@@ -13,20 +13,19 @@ import CloseButton from 'react-bootstrap/CloseButton';
 import { getCookie } from '../utils/cookieUtils';
 // logoutSession removed; using authorizedFetch directly
 
-export default function MainMenu(props) {
+export default function MainMenu({ setIsLogged, username, isSuperuser, setIsSuperuser }) {
     const [activeView, setActiveView] = useState("dash");
     const [projects, setProjects] = useState([]);
     const [loading, setLoading] = useState(false);
     const [runningTasks, setRunningTasks] = useState([]);
     const [exportTask, setExportTask] = useState(null);
     const [activeDialog, setActiveDialog] = useState("none");
-    const [isViewing,setViewing] = useState(false);
+    const [isViewing, setViewing] = useState(false);
     const [showLogoutDialog, setShowLogoutDialog] = useState(false);
 
     const [selectedTask, setSelectedTask] = useState(null);
     const [activeProjectId, setActiveProjectId] = useState(null);
     const [filterProjectId, setFilterProjectId] = useState(null);
-
 
     const API_BASE = "/api";
     const API_PROJECTS = `${API_BASE}/projects`;
@@ -49,8 +48,6 @@ export default function MainMenu(props) {
         }
     }, [fetchJSON]);
 
-
-
     const loadRunningTasksStructure = useCallback(async () => {
         setLoading(true);
         try {
@@ -63,15 +60,32 @@ export default function MainMenu(props) {
                     try {
                         const list = await fetchJSON(`${API_PROJECTS}/${p.id}/tasks/`);
                         const tasksArr = Array.isArray(list?.results) ? list.results : list;
-                        return (tasksArr || []).map((t) => ({
-                            projectId: p.id,
-                            taskId: t.id,
-                            projectName: projMap.get(p.id) || `Project ${p.id}`,
-                            taskName: t.name,
-                            status: t.status,
-                            running_progress: t.running_progress || 0 // Add running_progress
-                        }));
+
+                        // Fetch the full detail for each task instantly
+                        const detailedTasksPromises = (tasksArr || []).map(async (t) => {
+                            try {
+                                const taskDetail = await fetchJSON(`${API_PROJECTS}/${p.id}/tasks/${t.id}/`);
+                                return {
+                                    projectId: p.id,
+                                    taskId: t.id,
+                                    projectName: projMap.get(p.id) || `Project ${p.id}`,
+                                    taskName: t.name,
+                                    status: taskDetail.status,
+                                    running_progress: taskDetail.running_progress || 0,
+                                    processing_time: taskDetail.processing_time || null, // CONSOLIDATED: Fetch processing_time here
+                                };
+                            } catch (e) {
+                                // Handles errors for individual task detail fetch
+                                console.warn("Fetch detailed task failed for task", t.id, e);
+                                return null;
+                            }
+                        });
+
+                        // Filter out failed detailed fetches
+                        return (await Promise.all(detailedTasksPromises)).filter(t => t !== null);
+
                     } catch (e) {
+                        // Handles errors for listing tasks in a project
                         console.warn("List tasks failed for project", p.id, e);
                         return [];
                     }
@@ -79,14 +93,17 @@ export default function MainMenu(props) {
             );
 
             const flatRefs = perProjectTaskRefs.flat();
-            // Include ALL tasks, not just non-completed ones
+
             const shaped = flatRefs.map((task) => ({
                 id: task.taskId,
                 projectId: task.projectId,
                 projectName: task.projectName,
                 taskName: task.taskName,
-                progressPct: 0,
+                // Calculate progress and include all detail fields
+                progressPct: Math.round((task.running_progress || 0) * 100),
                 status: task.status,
+                running_progress: task.running_progress || 0,
+                processing_time: task.processing_time, // CONSOLIDATED: Include processing_time
             }));
 
             setRunningTasks(shaped);
@@ -106,13 +123,11 @@ export default function MainMenu(props) {
             const fetchPromises = runningTasks.map(async (task) => {
                 try {
                     // Use authorizedFetch to get the raw response
-
                     const res = await authorizedFetch(`${API_PROJECTS}/${task.projectId}/tasks/${task.id}/`);
-
+    
                     // Check for a 404 status code directly
                     if (res.status === 404) {
                         console.warn(`Task ${task.id} not found (404), removing from list.`);
-                        // Return null to signal that this task should be removed from the list
                         return null;
                     }
     
@@ -128,15 +143,13 @@ export default function MainMenu(props) {
                         progressPct,
                         status: taskStatus,
                         running_progress: taskDetail.running_progress || 0,
-                        processing_time: taskDetail.processing_time || null
+                        processing_time: taskDetail.processing_time || null // IMPORTANT: Ensure processing_time is updated here too
                     };
                 } catch (e) {
-                    // This catch block handles network errors or JSON parsing errors, but not 404s
                     console.warn(`Progress update failed for task ${task.id}:`, e);
                     return {
                         ...task,
                         progressPct: 100,
-                        // Set status to failed (30) on other errors for clarity
                         status: 30
                     };
                 }
@@ -211,24 +224,42 @@ export default function MainMenu(props) {
     useEffect(() => {
         let interval;
         if (activeView === "tasks" && runningTasks.length > 0) {
-            interval = setInterval(updateRunningTasksProgress, 5000);
+            interval = setInterval(updateRunningTasksProgress, 1000);
         }
         return () => {
             if (interval) clearInterval(interval);
         };
     }, [activeView, runningTasks, updateRunningTasksProgress]);
 
+    // Helper function for real-time subscription check
+    const checkSubscriptionStatus = async () => {
+        try {
+            const response = await authorizedFetch('/api/users/subscription-status');
+            const data = await response.json();
+            return data.is_subscribed || false;
+        } catch (error) {
+            console.error('Failed to check subscription status:', error);
+            return false;
+        }
+    };
 
-    const onAddProject=()=>{
+    const onAddProject = async () => {
+        const isCurrentlySubscribed = await checkSubscriptionStatus();
+        if (!isCurrentlySubscribed) {
+            alert('Subscription required');
+            return;
+        }
         setActiveDialog("create-project");
-
-
-    }
-    const onAddTask=(projectId)=>{
-
+    };
+    const onAddTask = async (projectId) => {
+        const isCurrentlySubscribed = await checkSubscriptionStatus();
+        if (!isCurrentlySubscribed) {
+            alert('Subscription required');
+            return;
+        }
         setActiveProjectId(projectId);
         setActiveDialog("edit-task");
-    }
+    };
     const DialogueManager = () => {
         useEffect(() => {
             const addCloseButtons = () => {
@@ -274,11 +305,17 @@ export default function MainMenu(props) {
         <div className="main-menu">
             <DialogueManager />
             <div className="sidebar-menu">
-                <Sidebar changeView={handleViewChange} setIsLogged={props.setIsLogged} activeView={activeView} setShowLogoutDialog={setShowLogoutDialog} />
+                <Sidebar
+                    changeView={handleViewChange}
+                    setIsLogged={setIsLogged}
+                    activeView={activeView}
+                    setShowLogoutDialog={setShowLogoutDialog}
+                    isSuperuser={isSuperuser} // Use prop passed from App.jsx
+                />
             </div>
             <div className="main-view">
                 {activeView === "dash" && <h1>Dashboard</h1>}
-                {activeView === "gcp" && <GcpInterface/>}
+                {activeView === "gcp" && <GcpInterface />}
                 {activeView === "proj" && (
                     <Projects
                         projects={projects}
@@ -307,42 +344,47 @@ export default function MainMenu(props) {
                         projects={projects}
                     />
                 )}
-                {
-                    activeDialog === "edit-task" && (
-                        <div className="modal-overlay">
-                            <div className="dialog">
-                                <CreateNewTask
-                                    exit={() => { setActiveDialog("none"); setActiveProjectId(null); }}
-                                    redirect={setActiveView}
-                                    projectId={activeProjectId}
-                                    onTaskCreated={refreshTasks} // Pass refreshTasks to CreateNewTask
-                                />
-                            </div>
-                        </div>
-                    )
-                }
-                {
-                    activeDialog === "create-project" && (
-                        <div className="modal-overlay"  >
-                            <div className="dialog no-close">
-                                <NewProject
-                                    onAddProject={async () => {
-                                        await fetchProjects();
-                                    }}
-                                    exit={() => { setActiveDialog("none") }}
-                                />
-                            </div>
-                        </div>
-                    )
-                }
-                {activeView === "admin" && <Admin changeView={handleViewChange} />}
+                {activeView === "admin" && (
+                    <Admin
+                        changeView={handleViewChange}
+                        isSuperuser={isSuperuser} // Use prop passed from App.jsx
+                    />
+                )}
             </div>
+            {
+                activeDialog === "edit-task" && (
+                    <div className="modal-overlay">
+                        <div className="dialog">
+                            <CreateNewTask
+                                exit={() => { setActiveDialog("none"); setActiveProjectId(null); }}
+                                redirect={setActiveView}
+                                projectId={activeProjectId}
+                                onTaskCreated={refreshTasks} // Pass refreshTasks to CreateNewTask
+                            />
+                        </div>
+                    </div>
+                )
+            }
+            {
+                activeDialog === "create-project" && (
+                    <div className="modal-overlay"  >
+                            <div className="dialog no-close">
+                            <NewProject
+                                onAddProject={async () => {
+                                    await fetchProjects();
+                                }}
+                                exit={() => { setActiveDialog("none") }}
+                            />
+                        </div>
+                    </div>
+                )
+            }
             {activeDialog === "export" && (
                 <div className="modal-overlay">
                     <div className="dialog">
                         <Export
-                            projectId={exportTask.projectId}
-                            taskId={exportTask.taskId}
+                            projectId={exportTask?.projectId}
+                            taskId={exportTask?.taskId}
                             onClose={() => setActiveDialog("none")} // Pass onClose prop
                         />
                     </div>
@@ -369,8 +411,7 @@ export default function MainMenu(props) {
                                     console.error('Logout failed', error);
                                 } finally {
                                     sessionStorage.removeItem('username');
-                                    props.setIsLogged(false);
-                                    navigate('/');
+                                    setIsLogged(false);
                                 }
                             }} className="logout-dialog-btn">Yes</button>
                             <button onClick={() => setShowLogoutDialog(false)} className="logout-dialog-btn no">No</button>

@@ -26,6 +26,18 @@ const ProjectBox = ({ project, onAddTask, onEditProject, onShowDeleteDialog, cha
   const [CompletedTasks, setCompletedTasks] = useState(0);
   const [Tasks, setTasks] = useState(0);
 
+  // Helper function for real-time subscription check
+  const checkSubscriptionStatus = async () => {
+    try {
+      const response = await authorizedFetch('/api/users/subscription-status');
+      const data = await response.json();
+      return data.is_subscribed || false;
+    } catch (error) {
+      console.error('Failed to check subscription status:', error);
+      return false;
+    }
+  };
+
   useEffect(() => {
     // Check if the project has tasks and get running task progress
     const fetchTasksAndProgress = async () => {
@@ -41,7 +53,7 @@ const ProjectBox = ({ project, onAddTask, onEditProject, onShowDeleteDialog, cha
           const completedCount = completedTasksArray.length;
 
           setCompletedTasks( completedCount);
-        
+
         if (CompletedTasks) {
           setProgress(CompletedTasks);
         } else {
@@ -127,7 +139,9 @@ const ProjectBox = ({ project, onAddTask, onEditProject, onShowDeleteDialog, cha
             <div className="project-header">
               <div className="project-title-section">
                 <div className="project-title">{project.name.toUpperCase()}</div>
-                  {hovering&&(<div className="edit-link" onClick={handleEdit}>
+                  {hovering&&(<div className="edit-link" onClick={
+
+                      handleEdit}>
 
                       <EditIcon sx={{color:"gray"}}/>
                   </div>)}
@@ -140,6 +154,7 @@ const ProjectBox = ({ project, onAddTask, onEditProject, onShowDeleteDialog, cha
           </>
 
         )}
+
 
          {!isEditing && (
           <><div className="progress">
@@ -192,7 +207,14 @@ const ProjectBox = ({ project, onAddTask, onEditProject, onShowDeleteDialog, cha
                               color="primary"
                               size="small"
                               aria-label="add"
-                              onClick={() => onAddTask(project.id)}
+                              onClick={async () => {
+                                  const isCurrentlySubscribed = await checkSubscriptionStatus();
+                                  if (!isCurrentlySubscribed) {
+                                      alert('Subscription required');
+                                      return;
+                                  }
+                                  onAddTask(project.id);
+                              }}
                           >
                               <AddIcon />
                           </Fab>

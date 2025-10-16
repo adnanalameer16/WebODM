@@ -69,7 +69,6 @@ class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model  = Profile
         exclude = ('id', ) 
-
         read_only_fields = ('user', )
 
 class AdminProfileViewSet(viewsets.ModelViewSet):
@@ -80,6 +79,55 @@ class AdminProfileViewSet(viewsets.ModelViewSet):
     
     def get_queryset(self):
         return Profile.objects.all()
+
+    @action(detail=True, methods=['patch'], url_path='update-subscription')
+    def update_subscription(self, request, user=None):
+        """
+        Allows admin to update the subscription status of a user with optional duration.
+        Expects: is_subscribed (bool), subscription_days (int, optional)
+        """
+        from django.utils import timezone
+        from datetime import timedelta
+        
+        try:
+            profile = self.get_object()
+            is_subscribed = request.data.get('is_subscribed', None)
+            subscription_days = request.data.get('subscription_days', None)
+
+            if is_subscribed is None:
+                return Response({"error": "is_subscribed field is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+            profile.is_subscribed = is_subscribed
+            
+            if is_subscribed:
+                if subscription_days is None:
+                    # Unlimited subscription - set NULL dates
+                    profile.subscription_start_date = None
+                    profile.subscription_end_date = None
+                else:
+                    # Time-limited subscription - set dates
+                    profile.subscription_start_date = timezone.now()
+                    
+                    if subscription_days and subscription_days > 0:
+                        profile.subscription_end_date = profile.subscription_start_date + timedelta(days=subscription_days)
+                    else:
+                        # If no days specified, default to 30 days
+                        profile.subscription_end_date = profile.subscription_start_date + timedelta(days=30)
+            else:
+                # When disabling subscription, clear the dates
+                profile.subscription_start_date = None
+                profile.subscription_end_date = None
+
+            profile.save()
+
+            return Response({
+                "message": "Subscription status updated successfully.", 
+                "is_subscribed": profile.is_subscribed,
+                "subscription_start_date": profile.subscription_start_date,
+                "subscription_end_date": profile.subscription_end_date
+            }, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     
     @action(detail=True, methods=['post'])

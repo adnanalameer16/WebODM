@@ -13,6 +13,9 @@ from webodm import settings
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     quota = models.FloatField(default=-1, blank=True, help_text=_("Maximum disk quota in megabytes"), verbose_name=_("Quota"))
+    is_subscribed = models.BooleanField(default=False, help_text=_("Whether this user has an active subscription"), verbose_name=_("Is Subscribed"))
+    subscription_start_date = models.DateTimeField(null=True, blank=True, help_text=_("When the subscription started"), verbose_name=_("Subscription Start Date"))
+    subscription_end_date = models.DateTimeField(null=True, blank=True, help_text=_("When the subscription expires"), verbose_name=_("Subscription End Date"))
 
     def has_valid_subscription(self):
         return True
@@ -65,6 +68,22 @@ class Profile(models.Model):
     
     def clear_quota_deadline(self):
         cache.delete(f'quota_deadline_{self.user.id}')
+
+    def check_subscription_expiry(self):
+        """Check if subscription has expired and update is_subscribed accordingly"""
+        from django.utils import timezone
+        
+        if self.is_subscribed and self.subscription_end_date:
+            if timezone.now() > self.subscription_end_date:
+                self.is_subscribed = False
+                self.save(update_fields=['is_subscribed'])
+                return True  # Subscription was expired
+        return False  # Subscription is still active or not set
+
+    def is_subscription_active(self):
+        """Check if user has an active subscription (with automatic expiry check)"""
+        self.check_subscription_expiry()
+        return self.is_subscribed
 
     
 @receiver(post_save, sender=User)

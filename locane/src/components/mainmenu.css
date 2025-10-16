@@ -58,7 +58,7 @@
     top: 50%;
     transform: translate(-50%, -50%);
     background: #fff;
-    padding: 24px 26px;
+    padding: 10px 100px;
     max-width: 65vw;
     max-height: 85vh;
     overflow: auto;

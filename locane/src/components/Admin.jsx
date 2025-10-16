@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './admin.css'
 import { authorizedFetch } from '../utils/api';
 
-function Admin({ changeView }) {
+function Admin({ changeView, isSuperuser }) {
     const [users, setUsers] = useState([]);
     const [showDeletePopup, setShowDeletePopup] = useState(false);
     const [showUserDialog, setShowUserDialog] = useState(false);
@@ -19,6 +19,9 @@ function Admin({ changeView }) {
         email: '',
         is_staff: false,
         is_active: false,
+        is_subscribed: false,
+        subscription_days: 30,
+        unlimited_subscription: false,
         groups: [],
         user_permissions: []
     });
@@ -37,8 +40,32 @@ function Admin({ changeView }) {
         try {
             const response = await authorizedFetch('/api/admin/users/');
             const data = await response.json();
-            console.log(data);
-            setUsers(data.results);
+            
+            // Fetch profile data for each user to get is_subscribed status
+            const usersWithProfiles = await Promise.all(
+                data.results.map(async (user) => {
+                    try {
+                        const profileResponse = await authorizedFetch(`/api/admin/profiles/${user.id}/`);
+                        const profileData = await profileResponse.json();
+                        return {
+                            ...user,
+                            is_subscribed: profileData.is_subscribed || false,
+                            subscription_start_date: profileData.subscription_start_date,
+                            subscription_end_date: profileData.subscription_end_date
+                        };
+                    } catch (error) {
+                        console.warn(`Failed to fetch profile for user ${user.id}:`, error);
+                        return {
+                            ...user,
+                            is_subscribed: false,
+                            subscription_start_date: null,
+                            subscription_end_date: null
+                        };
+                    }
+                })
+            );
+            
+            setUsers(usersWithProfiles);
         } catch (error) {
             console.error('Error fetching users:', error);
         }
@@ -55,21 +82,35 @@ function Admin({ changeView }) {
     };
 
     const handleSaveUser = async () => {
-        // Only check password confirmation for new users
         if (!currentUser && formData.password !== confirmPassword) {
             alert('Passwords do not match!');
             return;
         }
+
         try {
             const method = currentUser ? 'PUT' : 'POST';
             const url = currentUser ? `/api/admin/users/${currentUser.id}/` : '/api/admin/users/';
-            
-            // Send full formData (includes password as received from API for updates)
-            await authorizedFetch(url, {
+
+            // Save user data (create or update)
+            const response = await authorizedFetch(url, {
                 method,
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData),
             });
+
+            // Get the user ID (for new users, extract it from the response)
+            const userId = currentUser ? currentUser.id : (await response.json()).id;
+
+            // Update subscription status using the new endpoint
+            await authorizedFetch(`/api/admin/profiles/${userId}/update-subscription/`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    is_subscribed: formData.is_subscribed,
+                    subscription_days: formData.unlimited_subscription ? null : formData.subscription_days 
+                }),
+            });
+
             fetchUsers();
             closeUserDialog();
         } catch (error) {
@@ -81,7 +122,7 @@ function Admin({ changeView }) {
     const openUserDialog = (user = null) => {
         setCurrentUser(user);
         const initialData = user ? {
-            // Include password as received from API (not editable in UI)
+            // Include existing fields
             password: user.password || '',
             is_superuser: user.is_superuser || false,
             username: user.username || '',
@@ -90,9 +131,13 @@ function Admin({ changeView }) {
             email: user.email || '',
             is_staff: user.is_staff || false,
             is_active: user.is_active || false,
+            is_subscribed: user.is_subscribed !== undefined ? user.is_subscribed : false,
+            subscription_days: 30,
+            unlimited_subscription: false,
             groups: user.groups || [],
             user_permissions: user.user_permissions || []
         } : {
+            // Default values for new user
             password: '',
             is_superuser: false,
             username: '',
@@ -101,6 +146,9 @@ function Admin({ changeView }) {
             email: '',
             is_staff: false,
             is_active: false,
+            is_subscribed: false,
+            subscription_days: 30,
+            unlimited_subscription: false,
             groups: [],
             user_permissions: []
         };
@@ -265,6 +313,50 @@ function Admin({ changeView }) {
                             <label>
                                 <input type="checkbox" checked={formData.is_active} onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })} /> Active
                             </label>
+                            <label>
+                                <input 
+                                    type="checkbox" 
+                                    checked={formData.is_subscribed} 
+                                    onChange={(e) => {
+                                        const isSubscribed = e.target.checked;
+                                        const defaultPermissions = isSubscribed 
+                                            ? [33,34,35,36,45,46,47,48,49,50,51,52] // All WebODM permissions
+                                            : [];
+                                        setFormData({ 
+                                            ...formData, 
+                                            is_subscribed: isSubscribed,
+                                            user_permissions: defaultPermissions 
+                                        });
+                                    }} 
+                                /> 
+                                Subscribed User
+                            </label>
+                            {formData.is_subscribed && (
+                                <>
+                                    <label>
+                                        <input 
+                                            type="checkbox" 
+                                            checked={formData.unlimited_subscription} 
+                                            onChange={(e) => setFormData({ ...formData, unlimited_subscription: e.target.checked })} 
+                                        /> 
+                                        Unlimited Subscription (Admin)
+                                    </label>
+                                    {!formData.unlimited_subscription && (
+                                        <label>
+                                            Subscription Duration (Days):
+                                            <input 
+                                                type="number" 
+                                                min="0.000347" 
+                                                max="3650"
+                                                step="0.000001"
+                                                placeholder="30" 
+                                                value={formData.subscription_days} 
+                                                onChange={(e) => setFormData({ ...formData, subscription_days: parseFloat(e.target.value) || 30 })} 
+                                            />
+                                        </label>
+                                    )}
+                                </>
+                            )}
                             <button type="submit">OK</button>
                             <button type="button" onClick={closeUserDialog}>Cancel</button>
                         </form>
@@ -283,6 +375,21 @@ function Admin({ changeView }) {
                         <p><strong>Superuser:</strong> {selectedUser.is_superuser ? 'Yes' : 'No'}</p>
                         <p><strong>Staff:</strong> {selectedUser.is_staff ? 'Yes' : 'No'}</p>
                         <p><strong>Active:</strong> {selectedUser.is_active ? 'Yes' : 'No'}</p>
+                        <p><strong>Subscribed:</strong> {selectedUser.is_subscribed ? 'Yes' : 'No'}</p>
+                        {selectedUser.is_subscribed && (
+                            <>
+                                <p><strong>Subscription Start:</strong> {
+                                    selectedUser.subscription_start_date 
+                                        ? new Date(selectedUser.subscription_start_date).toLocaleString()
+                                        : 'Unlimited (Admin)'
+                                }</p>
+                                <p><strong>Subscription End:</strong> {
+                                    selectedUser.subscription_end_date 
+                                        ? new Date(selectedUser.subscription_end_date).toLocaleString()
+                                        : 'Unlimited (Admin)'
+                                }</p>
+                            </>
+                        )}
                         <p><strong>Groups:</strong> {selectedUser.groups.join(', ')}</p>
                         <p><strong>Permissions:</strong> {selectedUser.user_permissions.join(', ')}</p>
                         <button onClick={() => setShowUserInfoDialog(false)}>Close</button>

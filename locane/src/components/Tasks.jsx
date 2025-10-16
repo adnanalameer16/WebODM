@@ -3,6 +3,8 @@ import './Tasks.css';
 import ProjectViewer from "./ProjectContainer.jsx";
 import Export from './Export.jsx';
 import { authorizedFetch } from '../utils/api.js';
+import Tooltip from '@mui/material/Tooltip';
+import Zoom from '@mui/material/Zoom';
 
 // Helper function from the first code block for processing time format
 const formatProcessingTime = (milliseconds) => {
@@ -14,17 +16,18 @@ const formatProcessingTime = (milliseconds) => {
   return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 };
 
-// New TaskBox component with processing time functionality and second block's UI
+// New TaskBox component
 const TaskBox = ({ task, onAction, onShowDeleteDialog, fetchJSON, isDeleteDialogOpen = false, openExportTaskId, setOpenExportTaskId }) => {
   const [lastError, setLastError] = useState(null);
   const [isHovering, setIsHovering] = useState(false);
   const [thumbnailUrl, setThumbnailUrl] = useState(null);
-  // Added state for processing time
-  const [processingTime, setProcessingTime] = useState(null); 
+  
+  // NOTE: task.processing_time is used directly
 
   const fetchLastError = useCallback(async () => {
     if (task.status === 30) {
       try {
+        // Use authorizedFetch directly since fetchJSON is passed down as authorizedFetch
         const response = await fetchJSON(`/api/projects/${task.projectId}/tasks/${task.id}/`);
         setLastError(response.last_error || "No error details available");
       } catch (err) {
@@ -42,11 +45,8 @@ const TaskBox = ({ task, onAction, onShowDeleteDialog, fetchJSON, isDeleteDialog
 
   useEffect(() => {
     fetchLastError();
-    // Added logic for setting processing time on completion
-    if (task.status === 40 && task.processing_time && !processingTime) {
-      setProcessingTime(task.processing_time);
-    }
-  }, [fetchLastError, task, processingTime]); // Dependency array updated
+    // Removed redundant logic for setting processing time here
+  }, [fetchLastError, task]);
 
   const getStatusText = (statusCode) => {
     switch (statusCode) {
@@ -125,10 +125,10 @@ const TaskBox = ({ task, onAction, onShowDeleteDialog, fetchJSON, isDeleteDialog
               )}
             </div>
           )}
-          {/* Processing Time Display added here, as per the first code block's functionality */}
-          {effectiveStatus === 40 && processingTime && (
+          {/* Processing Time Display: Now uses task.processing_time directly */}
+          {effectiveStatus === 40 && task.processing_time && (
             <div className="task-processing-time">
-              <span className="processing-time-text">{formatProcessingTime(processingTime)}</span>
+              <span className="processing-time-text">{formatProcessingTime(task.processing_time)}</span>
             </div>
           )}
         </div>
@@ -145,7 +145,7 @@ const TaskBox = ({ task, onAction, onShowDeleteDialog, fetchJSON, isDeleteDialog
                 projectId={task.projectId} 
                 taskId={task.id} 
                 openExportTaskId={openExportTaskId} 
-                setOpenExportTaskId={setOpenExportTaskId} 
+                setOpenExportTaskId={setOpenExportTaskId}
               />
               <button className="btn-delete" onClick={() => onShowDeleteDialog({ ...task, actionType: 'delete' })}>Delete</button>
             </>
@@ -172,9 +172,13 @@ const TaskBox = ({ task, onAction, onShowDeleteDialog, fetchJSON, isDeleteDialog
       </div>
       {/* Thumbnail container exactly as in the second code block (no click handler) */}
       {isHovering && effectiveStatus === 40 && thumbnailUrl && (
+          <Tooltip title="View"slots={{
+            transition: Zoom,
+          }}>
         <div className="task-thumbnail-wrapper">
-          <img src={thumbnailUrl} alt={`Thumbnail for task ${task.id}`} className="task-thumbnail" />
-        </div>
+          <img src={thumbnailUrl} alt={`Thumbnail for task ${task.id}`} className="task-thumbnail"  onClick={()=>{handleAction("view")}}/>
+      
+      </div></Tooltip>
       )}
     </div>
   );
@@ -367,7 +371,7 @@ const Tasks = ({ runningTasks, loading, onRefresh, onTaskAction ,isViewing,exitV
                       openExportTaskId={openExportTaskId}
                       setOpenExportTaskId={setOpenExportTaskId}
                     />
-                  ))}
+                  )) }
                 </div>
               </div>
             )}
