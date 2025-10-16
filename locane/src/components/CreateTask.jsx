@@ -9,7 +9,7 @@ import './createtask.css';
 import axios from 'axios'
 import {getCookie} from "../utils/cookieUtils.js";
 import './Tasks.css'
-
+import CloseButton from 'react-bootstrap/CloseButton';
 function Map_Prev({ images }) {
     const [positions, setPositions] = useState([]);
 
@@ -42,7 +42,7 @@ function Map_Prev({ images }) {
 
     return (
         <div>
-            <MapContainer center={[20, 0]} zoom={2} scrollWheelZoom={true} style={{ height: "400px", width: "100%", marginTop: "20px" }}>
+            <MapContainer center={[20, 0]} zoom={2} scrollWheelZoom={true} style={{ height: "400px", width: "100%"}}>
                 <TileLayer
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -147,6 +147,8 @@ function Task({ images, defaultTaskName, onSubmit,isDisabled }) {
     return (
         <div className={`createtaskbox ${isDisabled ? 'disabled' : ''}`}>
             <div className="taskbox">
+                <div>
+                <label>Task Name</label>
                 <input
                     type="text"
                     name="name"
@@ -157,6 +159,7 @@ function Task({ images, defaultTaskName, onSubmit,isDisabled }) {
                     // Add the disabled attribute
                     disabled={isDisabled}
                 />
+                </div>
                 <form className="Task-form" onSubmit={handleSubmit}>
                     <div className="options-resize-container">
                         <div className="options">
@@ -363,21 +366,28 @@ export default function CreateNewTask({ exit, redirect, projectId, onTaskCreated
     const imagesForMap = imageFiles.map(item => item.file);
 
     return (
-        <div className="task-card">
-            {step > 1 && <button onClick={prevStep} disabled={isSubmitting} className="task-btn">Back</button>}
-            {step > 1 && <button onClick={exit} disabled={isSubmitting} className="task-btn cancel-btn">Cancel</button>}
-            {step < 2 && <button onClick={nextStep} className="task-btn">Next</button>}
-            {step < 2 && <button onClick={exit} className="task-btn cancel-btn">Cancel</button>}
+        <div>
 
-            {step === 1 && (
-                <Upload 
+        <div className="task-card">
+
+            <button onClick={prevStep} aria-label="Back" disabled={isSubmitting || step!==2} className="task-btn"> <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+            </svg></button>
+
+
+            <div>
+
+            <div>
+          </div>
+           {step === 1 && (
+                <Upload
 
                     imageFiles={imageFiles}
                     setImageFiles={setImageFiles}
-                    onDelete={handleImageDelete} 
+                    onDelete={handleImageDelete}
                 />
             )}
-            
+
             {step === 2 && (
                 <div>
                     <Task
@@ -401,7 +411,7 @@ export default function CreateNewTask({ exit, redirect, projectId, onTaskCreated
                             document.querySelector('.Task-form')?.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
                         }}
                         disabled={isSubmitting}
-                        className="task-btn"
+                        className="submit-button"
                     >Start Task
 
                     </button>)}
@@ -412,6 +422,16 @@ export default function CreateNewTask({ exit, redirect, projectId, onTaskCreated
                     {success && <div style={{ color: 'green', marginTop: '10px' }}>{success}</div>}
                 </div>
             )}
+            </div>
+            <button className="task-btn" aria-label="Next" onClick={nextStep} disabled={step!==1}>
+
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5"
+                     stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"/>
+                </svg>
+
+            </button>
+        </div>
         </div>
     );
 }

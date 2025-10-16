@@ -1,14 +1,17 @@
 import Sidebar from './Sidebar.jsx';
-import "./mainmenu.css";
+import "./mainmenu.css"
 import CreateNewTask from "./CreateTask.jsx";
-import React, { useCallback, useEffect, useState } from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import Projects from "./Projects";
 import Tasks from "./Tasks";
 import GcpInterface from './GcpInterface.jsx';
 import NewProject from './NewProject.jsx';
-import Export from './Export.jsx';
+import Export from './Export.jsx'
 import { authorizedFetch } from '../utils/api.js';
 import Admin from './Admin.jsx';
+import CloseButton from 'react-bootstrap/CloseButton';
+import { getCookie } from '../utils/cookieUtils';
+// logoutSession removed; using authorizedFetch directly
 
 export default function MainMenu({ setIsLogged, username, isSuperuser, setIsSuperuser }) {
     const [activeView, setActiveView] = useState("dash");
@@ -57,7 +60,7 @@ export default function MainMenu({ setIsLogged, username, isSuperuser, setIsSupe
                     try {
                         const list = await fetchJSON(`${API_PROJECTS}/${p.id}/tasks/`);
                         const tasksArr = Array.isArray(list?.results) ? list.results : list;
-                        
+
                         // Fetch the full detail for each task instantly
                         const detailedTasksPromises = (tasksArr || []).map(async (t) => {
                             try {
@@ -77,7 +80,7 @@ export default function MainMenu({ setIsLogged, username, isSuperuser, setIsSupe
                                 return null;
                             }
                         });
-                        
+
                         // Filter out failed detailed fetches
                         return (await Promise.all(detailedTasksPromises)).filter(t => t !== null);
 
@@ -90,14 +93,14 @@ export default function MainMenu({ setIsLogged, username, isSuperuser, setIsSupe
             );
 
             const flatRefs = perProjectTaskRefs.flat();
-            
+
             const shaped = flatRefs.map((task) => ({
                 id: task.taskId,
                 projectId: task.projectId,
                 projectName: task.projectName,
                 taskName: task.taskName,
                 // Calculate progress and include all detail fields
-                progressPct: Math.round((task.running_progress || 0) * 100), 
+                progressPct: Math.round((task.running_progress || 0) * 100),
                 status: task.status,
                 running_progress: task.running_progress || 0,
                 processing_time: task.processing_time, // CONSOLIDATED: Include processing_time
@@ -260,11 +263,11 @@ export default function MainMenu({ setIsLogged, username, isSuperuser, setIsSupe
     const DialogueManager = () => {
         useEffect(() => {
             const addCloseButtons = () => {
-                const dialogues = document.querySelectorAll('.dialog:not(.no-close)');
+                const dialogues = document.querySelectorAll('.dialog');
 
                 dialogues.forEach(dialogue => {
                     // Check if close button already exists
-                    if (!dialogue.querySelector('.dialog-close')) {
+                    if (!dialogue.classList.contains('no-close')) {
                         const closeButton = document.createElement('button');
                         closeButton.className = 'dialog-close';
 
@@ -297,8 +300,6 @@ export default function MainMenu({ setIsLogged, username, isSuperuser, setIsSupe
         await loadRunningTasksStructure();
         await fetchProjects();
     };
-
-
 
     return (
         <div className="main-menu">
@@ -367,7 +368,7 @@ export default function MainMenu({ setIsLogged, username, isSuperuser, setIsSupe
             {
                 activeDialog === "create-project" && (
                     <div className="modal-overlay"  >
-                        <div className="dialog">
+                            <div className="dialog no-close">
                             <NewProject
                                 onAddProject={async () => {
                                     await fetchProjects();
@@ -392,6 +393,7 @@ export default function MainMenu({ setIsLogged, username, isSuperuser, setIsSupe
             {showLogoutDialog && (
                 <div className="modal-overlay">
                     <div className="dialog no-close">
+
                         <p>Are you sure you want to logout?</p>
                         <div className="logout-dialog-actions">
                             <button onClick={async () => {

@@ -1,5 +1,6 @@
 import "./NewProject.css";
 import uploadIcon from "../assets/upload_icon.png";
+import Badge from "@mui/material/Badge"
 
 function Upload({ imageFiles, setImageFiles, onDelete }) {
 
@@ -16,10 +17,14 @@ function Upload({ imageFiles, setImageFiles, onDelete }) {
         <>
             <div className="upload-card">
                 <div className="upload" onClick={() => document.getElementById("file-input").click()}>
+
                     <div className="cloud">
                         <img src={uploadIcon} alt={"upload image"} />
-                    </div>
 
+                    </div>
+                    <div className={"Upload-text"}>
+                    <h2>Drag and Drop Files to Upload</h2>
+                    </div>
                     <input
                         id="file-input"
                         className="upload-btn"
@@ -33,26 +38,21 @@ function Upload({ imageFiles, setImageFiles, onDelete }) {
                 {imageFiles.length > 0 && (
                     <div className="images">
                         {imageFiles.map((item, i) => (
-                            <div className="thumbnail" key={i}>
+
+                            <div className="thumbnail" > <Badge badgeContent={"X"} color="error" key={i} onClick={()=>{onDelete(i)}}>
                                 <img
                                     className="preview-image"
                                     src={item.preview} 
                                     loading="lazy"
                                     alt={item.file.name} 
-                                />
-                                <button
-                                    className="delete-btn"
+                                /></Badge>
 
-                                    onClick={() => onDelete(i)}
-                                >
-                                    &times;
-                                </button>
                             </div>
                         ))}
                     </div>
                 )}
             </div>
-            <div className="file-count">Files Selected: {imageFiles.length}</div>
+            <div className="file-count">Files: {imageFiles.length}</div>
         </>
     );
 }

@@ -7,10 +7,9 @@
     max-height: 400px;
     justify-content: flex-start;
     align-items: center;
-    border: 1px solid var(--border-color);
     padding: 15px;
     box-sizing: border-box;
-    margin: 20px auto;
+
     background-color: var(--panel-color);
     gap: 15px;
 }
@@ -26,12 +25,16 @@
 }
 .taskbox {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
     width: 100%;
     padding: 10px;
     box-sizing: border-box;
+    flex-wrap: nowrap;
+    align-content: center;
+    justify-content: center;
+    row-gap: 20px;
 }
+
 
 .mapcontainer {
     width: 100%;
@@ -39,6 +42,16 @@
     border: 1px solid var(--border-color);
     border-radius: 5px;
     overflow: hidden;
+}
+.task-card{
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+}
+.TaskName{
+    width: 100%;
 }
 
 .options-resize-container {
@@ -51,19 +64,48 @@
     display: flex;
 }
 
-.task-btn {
-    padding: 0.85rem 1.75rem;
-    border: none;
-    border-radius: 8px;
+.task-card .task-btn  {
+    /* Shape and Size */
+    width: 3.5rem; /* 56px */
+    height: 3.5rem; /* 56px */
+    border-radius: 9999px; /* Fully circular */
+
+    /* Icon Centering */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    /* Base Styles - Now transparent */
+    border: 2px solid #6b7280;
     cursor: pointer;
-    font-weight: bold;
-    transition: all 0.2s ease;
-    font-size: 1rem;
-    background: #007bff !important; /* Blue color */
-    color: white !important; /* Ensure text color is white */
+    background-color: transparent !important;
+    color: #6b7280 !important;
+
+    /* Smooth transition for hover effects */
+    transition: all 0.2s ease-in-out;
+}
+
+.task-btn:hover   {
+    /* Darken border and icon on hover */
+    background-color: #f9fafb !important;
+    border-color: #1f2937 !important;
+    color: #1f2937 !important;
+}
+
+.task-btn:disabled {
+    /* Gray out when disabled */
+    background-color: #f3f4f6;
+    color: #9ca3af;
+    border-color: #d1d5db;
+    cursor: not-allowed;
+}
+
+.task-btn svg {
+    width: 1.5rem; /* 24px */
+    height: 1.5rem; /* 24px */
 }
 
 .cancel-btn {
-    background: #a6a6a6 !important; /* Gray color */
+
     margin-left: 10px;
 }

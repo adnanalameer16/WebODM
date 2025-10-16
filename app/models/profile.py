@@ -17,6 +17,9 @@ class Profile(models.Model):
     subscription_start_date = models.DateTimeField(null=True, blank=True, help_text=_("When the subscription started"), verbose_name=_("Subscription Start Date"))
     subscription_end_date = models.DateTimeField(null=True, blank=True, help_text=_("When the subscription expires"), verbose_name=_("Subscription End Date"))
 
+    def has_valid_subscription(self):
+        return True
+
     def has_quota(self):
         return self.quota != -1
 

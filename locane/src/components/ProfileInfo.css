@@ -3,7 +3,7 @@
     height: 90px;
     border-radius: 50%;
     padding: 3px;
-    background: linear-gradient(135deg, #089cc8 0%, #ff6a00 100%);
+
     display: flex;
     align-items: center;
     justify-content: center;
@@ -12,11 +12,11 @@
 }
 
 .profile-img-wrapper img {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    object-fit: cover;
-    background: #fff;
+    width: 100px;
+    height: 100px;
+
+    object-fit: contain;
+
     display: block;
 }
 
