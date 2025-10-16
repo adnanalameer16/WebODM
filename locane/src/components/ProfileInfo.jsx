@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import dp from "../assets/dp.jpg";
+import dp from "../assets/dp.png";
 import "./ProfileInfo.css";
 
 function ProfileInfo({ isCollapsed }) {

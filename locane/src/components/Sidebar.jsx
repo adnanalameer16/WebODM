@@ -17,7 +17,7 @@ import gcpUnselected from '../assets/GCP_sidebar_unselected.png';
 import adminSelected from '../assets/admin_sidebar_selected.png';
 import adminUnselected from '../assets/admin_sidebar_unselected.png';
 import logoutIcon from '../assets/logout_sidebar.png';
-
+import { Turn as Hamburger } from 'hamburger-react';
 function Sidebar({ changeView, activeView, setShowLogoutDialog }) {
     const [isSuperuser, setIsSuperuser] = useState(false);
     const [isCollapsed, setIsCollapsed] = useState(false);
@@ -60,11 +60,11 @@ function Sidebar({ changeView, activeView, setShowLogoutDialog }) {
     return(
         <div className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
             <div className="sidebar-header">
-                <button className="hamburger-btn" onClick={toggleSidebar}>
+                <Hamburger toggled={isCollapsed} toggle={toggleSidebar} size={20} color="white" />
                     <span></span>
                     <span></span>
                     <span></span>
-                </button>
+
             </div>
             <div className='profile'>
                 <ProfileInfo isCollapsed={isCollapsed}/>
@@ -92,10 +92,11 @@ function Sidebar({ changeView, activeView, setShowLogoutDialog }) {
                         {!isCollapsed && <span>Administration</span>}
                     </button>
                 )}
+                <button onClick={() => setShowLogoutDialog(true)} className="sidebar-logout">
+                    <img src={logoutIcon} alt="Logout" />
+                </button>
             </div>
-            <button onClick={() => setShowLogoutDialog(true)} className="sidebar-logout">
-                <img src={logoutIcon} alt="Logout" />
-            </button>
+
             <div className="sidebar-empty-space"></div>
         </div>
 
