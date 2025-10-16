@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { authorizedFetch } from '../utils/api.js';
 import ProjectBox from './Project_box';
 import './Projects.css';
+import AddIcon from "@mui/icons-material/Add";
 
 const Projects = ({ projects, loading, onAddProject, onAddTask, onEditProject, fetchProjects, changeView }) => {
   const [deleteDialogProject, setDeleteDialogProject] = useState(null);
@@ -25,7 +26,8 @@ const Projects = ({ projects, loading, onAddProject, onAddTask, onEditProject, f
   return (
     <div className="projects-container">
       <button className="add-button" onClick={onAddProject}>
-        ➕ New Project
+        New Project
+          <AddIcon sx={{marginLeft:2}}/>
       </button>
       {loading ? (
         <p className="loading">Loading projects...</p>

@@ -9,6 +9,7 @@ import NewProject from './NewProject.jsx';
 import Export from './Export.jsx'
 import { authorizedFetch } from '../utils/api.js';
 import Admin from './Admin.jsx';
+import CloseButton from 'react-bootstrap/CloseButton';
 import { getCookie } from '../utils/cookieUtils';
 // logoutSession removed; using authorizedFetch directly
 
@@ -105,8 +106,9 @@ export default function MainMenu(props) {
             const fetchPromises = runningTasks.map(async (task) => {
                 try {
                     // Use authorizedFetch to get the raw response
+
                     const res = await authorizedFetch(`${API_PROJECTS}/${task.projectId}/tasks/${task.id}/`);
-    
+
                     // Check for a 404 status code directly
                     if (res.status === 404) {
                         console.warn(`Task ${task.id} not found (404), removing from list.`);
@@ -230,11 +232,11 @@ export default function MainMenu(props) {
     const DialogueManager = () => {
         useEffect(() => {
             const addCloseButtons = () => {
-                const dialogues = document.querySelectorAll('.dialog:not(.no-close)');
+                const dialogues = document.querySelectorAll('.dialog');
 
                 dialogues.forEach(dialogue => {
                     // Check if close button already exists
-                    if (!dialogue.querySelector('.dialog-close')) {
+                    if (!dialogue.classList.contains('no-close')) {
                         const closeButton = document.createElement('button');
                         closeButton.className = 'dialog-close';
 
@@ -349,6 +351,7 @@ export default function MainMenu(props) {
             {showLogoutDialog && (
                 <div className="modal-overlay">
                     <div className="dialog no-close">
+
                         <p>Are you sure you want to logout?</p>
                         <div className="logout-dialog-actions">
                             <button onClick={async () => {

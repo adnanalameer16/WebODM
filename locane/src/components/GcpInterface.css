@@ -3,8 +3,8 @@
     --header-color: #6c757d;
     --text-color: #333;
     --border-color: #dee2e6;
-    --button-bg: #e9ecef;
-    --button-hover-bg: #d4dae0;
+    --button-bg: rgba(0, 145, 213, 0);
+    --button-hover-bg: rgba(100, 148, 236, 0.06);
 }
 
 .gcp-window {
@@ -137,7 +137,7 @@
 .image-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(100px, 1fr));
-    gap: 10px;
+    gap: 1px;
 }
 
 .thumbnail {

@@ -38,14 +38,23 @@
  }
 .submit-button {
     padding: 0.85rem 1.75rem;
-    border: none;
+    border: 1px solid #e2e8f0 !important;
     border-radius: 8px;
     cursor: pointer;
     font-weight: bold;
     transition: all 0.2s ease;
     font-size: 1rem;
-    background: #007bff;
+    background: rgba(0, 123, 255, 0) !important;
     color: white;
+
+
+
+}
+.submit-button:hover {
+
+    background: rgba(0, 157, 255, 0.24) !important;
+    transition: border-color 0.2s ease;
+    border-color: rgba(0, 0, 0, 0.18) !important;
 }
 .cancel-button {
     padding: 0.85rem 1.75rem;
@@ -93,6 +102,10 @@
      width: 100%;
      height: 100%;
      object-fit: cover;
+
+ }
+ .cloud img:hover{
+
  }
 .upload-card{
     display: flex;
@@ -103,13 +116,29 @@
     max-height: 400px; 
     justify-content: space-between;
     align-items: center;
-    border: 1px solid var(--border-color);
+
     padding: 10px; 
     box-sizing: border-box;
     margin: 0 auto; 
 }
+.file-count{
+    margin-left: 1rem;
+    opacity: 50%;
 
-.upload{
+}
+.upload-content{
+
+
+
+}
+.action-task{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+
+}
+.upload
+{
     width: 100%;
     height: 100%;
 
@@ -118,15 +147,34 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    border: 2px dashed var(--border-color);
+
     background-color: var(--button-bg);
+    border-radius: 25px;
+    border-style: dashed;
+    border-width: 3px;
+    border-color: rgba(100, 149, 237, 0.2);
+    opacity: 0.7;
     transition: background-color 0.3s ease, border-color 0.3s ease;
 
 }
+.upload:hover{
+    opacity: 1;
+    transition: opacity 0.3s  ease;
 
+}
+
+.Upload-text{
+
+    margin: 10%;
+    margin-top: 0;
+    text-align: center;
+    opacity: 40%;
+
+
+}
 .upload:hover {
     background-color: var(--button-hover-bg);
-    border-color: #aaa; 
+
 }
 
 .upload-btn {
@@ -134,14 +182,14 @@
     font-size: 20px;
     cursor: pointer;
     background-color: var(--panel-color);
-    border: 1px solid var(--border-color);
-    border-radius: 5px;
+
+    border-radius: 16px;
     transition: background-color 0.3s ease, border-color 0.3s ease; 
 }
 
 .upload-btn:hover {
     background-color: var(--button-hover-bg);
-    border-color: #888;
+
 }
 
 .images{
@@ -152,11 +200,10 @@
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 8px; 
-    border-left-style: solid;
-    border-left-width: 5px;
+    margin-left:10%;
     overflow-y: auto;
     overflow-x:visible;
-    padding: 10px; 
+    padding: 10px;
     box-sizing: border-box; 
     background-color: var(--panel-color); 
 }
@@ -177,8 +224,8 @@
 }
 .thumbnail {
     position: relative;
-    border: 1px solid var(--border-color);
-    padding: 4px;
+    border:none !important;
+    padding: 0;
 }
 
 .thumbnail img {
@@ -187,23 +234,3 @@
     display: block;
 }
 
-.thumbnail .delete-btn {
-    position: absolute;
-    top: -5px;
-    right: -5px;
-    background-color: red;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    cursor: pointer;
-    font-weight: bold;
-    line-height: 20px;
-    text-align: center;
-    opacity: 0.8;
-}
-
-.thumbnail .delete-btn:hover {
-    opacity: 1;
-}
