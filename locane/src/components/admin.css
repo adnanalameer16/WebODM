@@ -92,12 +92,45 @@
 
 .dialog input[type="checkbox"] {
     margin-right: 0.5rem;
+    margin-top: 0;
+    margin-bottom: 0;
+    width: 16px;
+    height: 16px;
+    align-self: flex-start;
+}
+
+/* Special styling for checkbox labels */
+.dialog label:has(input[type="checkbox"]) {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.dialog input[type="number"] {
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
 }
 
 .dialog p {
     font-size: 1rem;
     margin: 0.5rem 0;
     color: #333;
+}
+
+/* Simple alignment for user information */
+.dialog p {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0.5rem 0;
+    padding: 0.5rem 0;
+}
+
+.dialog p strong {
+    min-width: 150px;
+    flex-shrink: 0;
 }
 
 .dialog button {
