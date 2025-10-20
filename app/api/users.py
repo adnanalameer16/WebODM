@@ -30,4 +30,16 @@ class UserSubscriptionStatus(APIView):
     def get(self, request):
         user = request.user
         is_subscribed = hasattr(user, 'profile') and user.profile.is_subscription_active()
-        return Response({'is_subscribed': is_subscribed})
+        
+        # Get subscription dates if user has a profile
+        subscription_start_date = None
+        subscription_end_date = None
+        if hasattr(user, 'profile'):
+            subscription_start_date = user.profile.subscription_start_date
+            subscription_end_date = user.profile.subscription_end_date
+        
+        return Response({
+            'is_subscribed': is_subscribed,
+            'subscription_start_date': subscription_start_date,
+            'subscription_end_date': subscription_end_date
+        })

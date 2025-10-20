@@ -26,9 +26,23 @@
 .sidebar-header {
     width: 100%;
     display: flex;
-    justify-content: flex-start;
-    padding: 0 0 10px 20px;
-    margin-bottom: 10px;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dp-icon-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    margin-right: 5%;
+}
+
+.dp-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
 }
 
 .hamburger-btn {

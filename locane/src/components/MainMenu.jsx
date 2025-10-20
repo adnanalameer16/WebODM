@@ -22,6 +22,8 @@ export default function MainMenu({ setIsLogged, username, isSuperuser, setIsSupe
     const [activeDialog, setActiveDialog] = useState("none");
     const [isViewing, setViewing] = useState(false);
     const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+    const [showUserInfo, setShowUserInfo] = useState(false);
+    const [userInfo, setUserInfo] = useState(null);
 
     const [selectedTask, setSelectedTask] = useState(null);
     const [activeProjectId, setActiveProjectId] = useState(null);
@@ -301,6 +303,33 @@ export default function MainMenu({ setIsLogged, username, isSuperuser, setIsSupe
         await fetchProjects();
     };
 
+    const handleProfileClick = async () => {
+        try {
+            const username = sessionStorage.getItem("username");
+            
+            const subscriptionResponse = await authorizedFetch('/api/users/subscription-status');
+            const subscriptionData = await subscriptionResponse.json();
+            
+            setUserInfo({
+                name: username || 'User',
+                subscriptionStatus: subscriptionData.is_subscribed ? 'Active' : 'Inactive',
+                subscriptionStartDate: subscriptionData.subscription_start_date,
+                subscriptionEndDate: subscriptionData.subscription_end_date
+            });
+            setShowUserInfo(true);
+        } catch (error) {
+            console.error('Error fetching subscription status:', error);
+            const username = sessionStorage.getItem("username");
+            setUserInfo({
+                name: username || 'User',
+                subscriptionStatus: 'Unknown',
+                subscriptionStartDate: null,
+                subscriptionEndDate: null
+            });
+            setShowUserInfo(true);
+        }
+    };
+
     return (
         <div className="main-menu">
             <DialogueManager />
@@ -311,6 +340,7 @@ export default function MainMenu({ setIsLogged, username, isSuperuser, setIsSupe
                     activeView={activeView}
                     setShowLogoutDialog={setShowLogoutDialog}
                     isSuperuser={isSuperuser} // Use prop passed from App.jsx
+                    onProfileClick={handleProfileClick}
                 />
             </div>
             <div className="main-view">
@@ -416,6 +446,30 @@ export default function MainMenu({ setIsLogged, username, isSuperuser, setIsSupe
                             }} className="logout-dialog-btn">Yes</button>
                             <button onClick={() => setShowLogoutDialog(false)} className="logout-dialog-btn no">No</button>
                         </div>
+                    </div>
+                </div>
+            )}
+            {showUserInfo && userInfo && (
+                <div className="modal-overlay">
+                    <div className="dialog">
+                        <h2>User Information</h2>
+                        <p><strong>Name:</strong> {userInfo.name}</p>
+                        <p><strong>Subscription Status:</strong> {userInfo.subscriptionStatus}</p>
+                        {userInfo.subscriptionStatus === 'Active' && (
+                            <>
+                                <p><strong>Subscription Start:</strong> {
+                                    userInfo.subscriptionStartDate 
+                                        ? new Date(userInfo.subscriptionStartDate).toLocaleString()
+                                        : 'Unlimited (Admin)'
+                                }</p>
+                                <p><strong>Subscription End:</strong> {
+                                    userInfo.subscriptionEndDate 
+                                        ? new Date(userInfo.subscriptionEndDate).toLocaleString()
+                                        : 'Unlimited (Admin)'
+                                }</p>
+                            </>
+                        )}
+                        <button onClick={() => setShowUserInfo(false)}>Close</button>
                     </div>
                 </div>
             )}

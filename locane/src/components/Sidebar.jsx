@@ -17,9 +17,10 @@ import gcpUnselected from '../assets/GCP_sidebar_unselected.png';
 import adminSelected from '../assets/admin_sidebar_selected.png';
 import adminUnselected from '../assets/admin_sidebar_unselected.png';
 import logoutIcon from '../assets/logout_sidebar.png';
+import dpIcon from '../assets/dp.jpg';
 
 import { Turn as Hamburger } from 'hamburger-react';
-function Sidebar({ changeView, activeView, setShowLogoutDialog,isSuperuser }) {
+function Sidebar({ changeView, activeView, setShowLogoutDialog,isSuperuser, onProfileClick }) {
       const [isCollapsed, setIsCollapsed] = useState(false);
 
     const doDashboard = () => changeView("dash");
@@ -36,10 +37,15 @@ function Sidebar({ changeView, activeView, setShowLogoutDialog,isSuperuser }) {
         <div className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
             <div className="sidebar-header">
                 <Hamburger toggled={isCollapsed} toggle={toggleSidebar} size={20} color="white" />
-                    <span></span>
-                    <span></span>
-                    <span></span>
-
+                {!isCollapsed && (
+                    <button className="dp-icon-btn" onClick={onProfileClick}>
+                        <img 
+                            src={dpIcon} 
+                            alt="Profile" 
+                            className="dp-icon" 
+                        />
+                    </button>
+                )}
             </div>
             <div className='profile'>
                 <ProfileInfo isCollapsed={isCollapsed}/>
