@@ -2,7 +2,9 @@ import "./NewProject.css";
 import "./upload.css";
 import uploadIcon from "../assets/upload_icon.png";
 import Badge from "@mui/material/Badge"
-
+import Button from "@mui/material/Button";
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import SettingsIcon from '@mui/icons-material/Settings';
 function Upload({ imageFiles, setImageFiles, onDelete, changeView, exit, gcpFile, setGcpFile }) {
 
     const handleFileSelect = (e) => {
@@ -76,14 +78,46 @@ function Upload({ imageFiles, setImageFiles, onDelete, changeView, exit, gcpFile
                     {gcpFile && <span className="gcp-file-indicator"> | GCP: {gcpFile.name}</span>}
                 </div>
                 <div className="gcp-buttons">
-                    <button className="gcp-btn add-gcp-btn" onClick={(e) => { 
-                        e.preventDefault(); 
-                        e.stopPropagation(); 
-                        document.getElementById("gcp-file-input").click(); 
-                    }}>
-                        {gcpFile ? "Change GCP" : "Add GCP"}
-                    </button>
-                    <button className="gcp-btn create-gcp-btn" onClick={() => { changeView('gcp'); exit(); }}>Create GCP</button>
+                    <Button
+                        variant="contained"          /* Primary, solid color button */
+                        color="secondary"
+
+                        /* Uses the theme's primary color */
+                        startIcon={<CloudUploadIcon />} /* Visually indicates a file upload */
+                        onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            // Keep your file input logic here
+                            document.getElementById("gcp-file-input").click();
+                        }}
+                        sx={{
+                            marginRight: 2, /* Add spacing between the two buttons */
+                            textTransform: 'none',
+                            background: "#0d6efd !important" /* Keep text standard for better readability */
+                        }}
+                    >
+                        {gcpFile ? "Change GCP File" : "Upload GCP File(Optional)"}
+                    </Button>
+
+                    {/* 2. Create GCP Button (Secondary Action) */}
+                    <Button
+                        variant="outlined"           /* Secondary, less emphasis */
+                        color="secondary"            /* Uses the secondary color or primary if preferred */
+                        startIcon={<SettingsIcon />}
+                        onClick={() => {
+                            changeView('gcp');
+                            // Assuming 'exit' is a function that performs necessary navigation/cleanup
+                            if (typeof exit === 'function') {
+                                exit();
+                            }
+                        }}
+
+                        sx={{
+                            textTransform: 'none'
+                        }}
+                    >
+                        Create GCP
+                    </Button>
                 </div>
             </div>
         </>

@@ -38,7 +38,7 @@ const Projects = ({ projects, loading, onAddProject, onAddTask, onEditProject, f
 
   return (
     <div className="projects-container">
-      <button className="add-button" onClick={async () => {
+      <button className="add-btn" onClick={async () => {
           const isCurrentlySubscribed = await checkSubscriptionStatus();
           if (!isCurrentlySubscribed) {
               alert('Subscription required');
