@@ -22,7 +22,7 @@ export default function MainMenu({ setIsLogged, username, isSuperuser, setIsSupe
     const [activeDialog, setActiveDialog] = useState("none");
     const [isViewing, setViewing] = useState(false);
     const [showLogoutDialog, setShowLogoutDialog] = useState(false);
-    const [showUserInfo, setShowUserInfo] = useState(false);
+
     const [userInfo, setUserInfo] = useState(null);
 
     const [selectedTask, setSelectedTask] = useState(null);
@@ -316,7 +316,7 @@ export default function MainMenu({ setIsLogged, username, isSuperuser, setIsSupe
                 subscriptionStartDate: subscriptionData.subscription_start_date,
                 subscriptionEndDate: subscriptionData.subscription_end_date
             });
-            setShowUserInfo(true);
+            setActiveDialog('user');
         } catch (error) {
             console.error('Error fetching subscription status:', error);
             const username = sessionStorage.getItem("username");
@@ -326,7 +326,7 @@ export default function MainMenu({ setIsLogged, username, isSuperuser, setIsSupe
                 subscriptionStartDate: null,
                 subscriptionEndDate: null
             });
-            setShowUserInfo(true);
+            setActiveDialog('user');
         }
     };
 
@@ -449,7 +449,7 @@ export default function MainMenu({ setIsLogged, username, isSuperuser, setIsSupe
                     </div>
                 </div>
             )}
-            {showUserInfo && userInfo && (
+            {activeDialog==='user' && userInfo && (
                 <div className="modal-overlay">
                     <div className="dialog">
                         <h2>User Information</h2>
@@ -469,7 +469,7 @@ export default function MainMenu({ setIsLogged, username, isSuperuser, setIsSupe
                                 }</p>
                             </>
                         )}
-                        <button onClick={() => setShowUserInfo(false)}>Close</button>
+
                     </div>
                 </div>
             )}
