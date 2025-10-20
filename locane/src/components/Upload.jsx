@@ -1,8 +1,9 @@
 import "./NewProject.css";
+import "./upload.css";
 import uploadIcon from "../assets/upload_icon.png";
 import Badge from "@mui/material/Badge"
 
-function Upload({ imageFiles, setImageFiles, onDelete }) {
+function Upload({ imageFiles, setImageFiles, onDelete, changeView, exit, gcpFile, setGcpFile }) {
 
     const handleFileSelect = (e) => {
         const chosenFiles = Array.from(e.target.files);
@@ -11,6 +12,15 @@ function Upload({ imageFiles, setImageFiles, onDelete }) {
             preview: URL.createObjectURL(file)
         }));
         setImageFiles(currentFiles => [...currentFiles, ...newImageItems]);
+    };
+
+    const handleGcpFileSelect = (e) => {
+        const file = e.target.files[0];
+        if (file && file.type === "text/plain") {
+            setGcpFile(file);
+        } else {
+            alert("Please select a valid .txt file");
+        }
     };
 
     return (
@@ -52,7 +62,30 @@ function Upload({ imageFiles, setImageFiles, onDelete }) {
                     </div>
                 )}
             </div>
-            <div className="file-count">Files: {imageFiles.length}</div>
+            {/* GCP file input placed outside upload-card to avoid click conflicts */}
+            <input
+                id="gcp-file-input"
+                type="file"
+                accept=".txt,text/plain"
+                onChange={handleGcpFileSelect}
+                style={{ display: "none" }}
+            />
+            <div className="file-info-bar">
+                <div className="file-count">
+                    Files: {imageFiles.length}
+                    {gcpFile && <span className="gcp-file-indicator"> | GCP: {gcpFile.name}</span>}
+                </div>
+                <div className="gcp-buttons">
+                    <button className="gcp-btn add-gcp-btn" onClick={(e) => { 
+                        e.preventDefault(); 
+                        e.stopPropagation(); 
+                        document.getElementById("gcp-file-input").click(); 
+                    }}>
+                        {gcpFile ? "Change GCP" : "Add GCP"}
+                    </button>
+                    <button className="gcp-btn create-gcp-btn" onClick={() => { changeView('gcp'); exit(); }}>Create GCP</button>
+                </div>
+            </div>
         </>
     );
 }

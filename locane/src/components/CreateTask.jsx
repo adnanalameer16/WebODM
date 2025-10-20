@@ -210,6 +210,7 @@ function Task({ images, defaultTaskName, onSubmit,isDisabled }) {
 export default function CreateNewTask({ exit, redirect, projectId, onTaskCreated }) {
 
     const [imageFiles, setImageFiles] = useState([]);
+    const [gcpFile, setGcpFile] = useState(null);
     const [step, setStep] = useState(1);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState(null);
@@ -259,7 +260,7 @@ export default function CreateNewTask({ exit, redirect, projectId, onTaskCreated
             if (onTaskCreated) {
                 onTaskCreated(); // Notify parent component about task creation
             }
-            await uploadImages(imageFiles,id);
+            await uploadImages(imageFiles, gcpFile, id);
             await commitImages(id);
             exit()
         } catch (err) {
@@ -275,7 +276,7 @@ export default function CreateNewTask({ exit, redirect, projectId, onTaskCreated
 
     }
 
-    async function uploadImages(imageFiles,taskId) {
+    async function uploadImages(imageFiles, gcpFile, taskId) {
         const ratio=100/imageFiles.length;
 
         const upload=`/api/projects/${projectId}/tasks/${taskId}/upload/`;
@@ -296,6 +297,20 @@ export default function CreateNewTask({ exit, redirect, projectId, onTaskCreated
                 }},
             });
         });
+
+        // Add GCP file upload if it exists
+        if (gcpFile) {
+            const gcpFormData = new FormData();
+            gcpFormData.append("images", gcpFile);
+            
+            uploadPromises.push(
+                axios.post(upload, gcpFormData, {
+                    headers: { 'X-CSRFToken': getCookie("csrftoken"), 'X-Requested-With': XMLHttpRequest},
+                    method: "POST",
+                    withCredentials: true,
+                })
+            );
+        }
 
         try {
             // Wait for ALL promises in the array to resolve
@@ -381,10 +396,13 @@ export default function CreateNewTask({ exit, redirect, projectId, onTaskCreated
           </div>
            {step === 1 && (
                 <Upload
-
                     imageFiles={imageFiles}
                     setImageFiles={setImageFiles}
                     onDelete={handleImageDelete}
+                    changeView={redirect}
+                    exit={exit}
+                    gcpFile={gcpFile}
+                    setGcpFile={setGcpFile}
                 />
             )}
 
