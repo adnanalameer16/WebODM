@@ -3,6 +3,7 @@ import { authorizedFetch } from '../utils/api.js';
 import ProjectBox from './Project_box';
 import './Projects.css';
 import AddIcon from "@mui/icons-material/Add";
+import {Grid, Skeleton} from "@mui/material";
 
 const Projects = ({ projects, loading, onAddProject, onAddTask, onEditProject, fetchProjects, changeView }) => {
   const [deleteDialogProject, setDeleteDialogProject] = useState(null);
@@ -50,7 +51,26 @@ const Projects = ({ projects, loading, onAddProject, onAddTask, onEditProject, f
 
       </button>
       {loading ? (
-        <p className="loading">Loading projects...</p>
+          <Grid container spacing={3}> {/* spacing adds gaps between items */}
+              {/* Map over an array to create 9 items */}
+              {Array.from({ length: 5 }).map((_, index) => (
+                  <Grid item xs={12} sm={6} md={4} key={index}>
+                      {/* md={4} means 4/12 columns = 3 columns on medium screens and up
+                  sm={6} means 6/12 columns = 2 columns on small screens
+                  xs={12} means 12/12 columns = 1 column on extra-small screens
+                */}
+                      <Skeleton variant="rounded" width={350} animation={"wave"} >
+                          {/* The ProjectBox is placed inside to inherit its dimensions,
+                        but it won't be visible due to the Skeleton overlay.
+                        Its height/width should be defined by the Skeleton's size.
+                    */}
+                          <ProjectBox
+                              project={{ id: 0, name: "Loading...", description: "Loading..." }}
+                          />
+                      </Skeleton>
+                  </Grid>
+              ))}
+          </Grid>
       ) : (
         <div className="project-grid">
           {projects.map((proj) => (

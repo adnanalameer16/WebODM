@@ -5,6 +5,9 @@ import Export from './Export.jsx';
 import { authorizedFetch } from '../utils/api.js';
 import Tooltip from '@mui/material/Tooltip';
 import Zoom from '@mui/material/Zoom';
+import {Chip, Grid, IconButton, Skeleton} from "@mui/material";
+import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded';
+import CloseIcon from "@mui/icons-material/Close";
 
 // Helper function from the first code block for processing time format
 const formatProcessingTime = (milliseconds) => {
@@ -264,19 +267,39 @@ const Tasks = ({ runningTasks, loading, onRefresh, onTaskAction ,isViewing,exitV
       <div className="tasks-container">
         <div className="view-header">
           <h2>Tasks</h2>
-          {filterProjectName && (
-            <div className="filter-info">
-              <span>Filter: {filterProjectName}</span>
-              <button className="clear-filter" onClick={() => onClearFilter()}>✖</button>
-            </div>
-          )}
-          <button className="refresh-button" onClick={onRefresh}>
-            🔄 Refresh
-          </button>
+
+          <IconButton aria-label={"refresh"} onClick={onRefresh}><RefreshRoundedIcon/></IconButton>
+
         </div>
+          {filterProjectName && (
+              <Chip
+                  label={`${filterProjectName}`}
+                  onDelete={onClearFilter}
+                  deleteIcon={<CloseIcon />}
+                  variant="outlined" // Optional: gives it a clear border
+                  color="primary" // Optional: gives it a primary color theme
+              />
+          )}
         
-        {loading ? (
-          <p className="loading">Loading tasks...</p>
+        {loading ? (<>
+         <Skeleton variant={"rounded"}  ><h1>Completed Tasks</h1></Skeleton>
+            <Grid container spacing={3}> {/* spacing adds gaps between items */}
+                {/* Map over an array to create 9 items */}
+                {Array.from({ length: 4 }).map((_, index) => (
+                    <Grid item xs={12} sm={6} md={4} key={index}>
+                        {/* md={4} means 4/12 columns = 3 columns on medium screens and up
+                  sm={6} means 6/12 columns = 2 columns on small screens
+                  xs={12} means 12/12 columns = 1 column on extra-small screens
+                */}
+                        <Skeleton variant="rounded" width={500} height={250}/>
+
+
+
+                    </Grid>
+                ))}
+            </Grid>
+            </>
+
         ) : runningTasks.length === 0 ? (
           <p className="no-tasks">No tasks found.</p>
         ) : (
