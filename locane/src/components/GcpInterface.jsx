@@ -7,7 +7,8 @@ import './GcpInterface.css';
 import ImageViewer from "./ImageViewer"; 
 import { useNavigate } from "react-router-dom"; 
 import Login from './Login'; 
-import { authorizedFetch } from '../utils/api.js'; 
+import { authorizedFetch } from '../utils/api.js';
+import CloseIcon from "@mui/icons-material/Close";
 
 const MapBoundsUpdater = ({ bounds }) => { 
     const map = useMap(); 
@@ -344,7 +345,8 @@ function GcpInterface() {
                                 <span className="link-count-badge">{linkCount}</span> 
                                 {/* Delete button is on top right */}
                                 <button className="delete-btn" onClick={(e) => handleRemoveImage(e, image.url)}> 
-                                X</button> 
+                                <CloseIcon />
+                                </button>
                             </div> 
                         )})} 
                     </div> 

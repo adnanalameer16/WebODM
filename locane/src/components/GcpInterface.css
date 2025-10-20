@@ -1,5 +1,5 @@
 :root { 
-    --panel-color: #f0f0f0; /* Light grey panel background from your last input */ 
+    --panel-color: rgba(240, 240, 240, 0); /* Light grey panel background from your last input */
     --header-color: #6c757d; 
     --text-color: #333; 
     --border-color: #dee2e6; 
@@ -244,8 +244,8 @@
     padding: 0; /* Remove padding */
     cursor: pointer; 
     background-color: #fff; 
-    border-radius: 8px; /* Rounded corners */
-    overflow: hidden; /* Important for rounding the image */
+    border-radius: 8px;
+    overflow: hidden;
 } 
 
 .thumbnail img { 
@@ -256,7 +256,8 @@
 
 .thumbnail .image-name { 
     display: none; 
-} 
+}
+
 
 .thumbnail .delete-btn { 
     /* Position inside the image, top right */
@@ -264,7 +265,7 @@
     top: 5px; 
     right: 5px; 
     background-color: rgba(255, 255, 255, 0); /* Semi-transparent red */
-    color: white; 
+    color: rgba(0, 0, 0, 0.57);
     border: none; 
     border-radius: 50%; 
     width: 20px; 
@@ -275,9 +276,18 @@
     text-align: center; 
     font-size: 1.2em;
     padding: 0;
-    opacity: 1;
+    opacity: 0;
     z-index: 5;
-} 
+}
+.delete-btn:hover {
+    color: #000000;
+    transition: color 0.2s;
+}
+
+.thumbnail:hover .delete-btn {
+    opacity: 1;
+    transition: opacity 0.2s;
+}
 
 .link-count-badge { 
     /* Position inside the image, top left */
@@ -285,7 +295,7 @@
     top: 5px; 
     left: 5px; 
     background-color: #e0f0ff00; 
-    color: white; 
+    color: rgba(0, 0, 0, 0.51);
     border-radius: 50%; 
     width: 25px; /* Slightly larger */
     height: 25px; 
@@ -294,7 +304,7 @@
     align-items: center; 
     font-size: 14px; 
     font-weight: bold; 
-    border: 2px solid white; /* White border */
+    border: 2px solid rgba(0, 0, 0, 0.45); /* White border */
     z-index: 5; 
 } 
 
