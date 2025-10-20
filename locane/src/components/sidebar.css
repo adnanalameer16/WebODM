@@ -1,9 +1,24 @@
 .sidebar {
     height: 92vh;
     width: 18vw;
-    background: linear-gradient(180deg, #83c9f8 0%, #34bbff 50%, #0582ca 100%);
+    /* Create a gradient that is twice as wide and includes the "hover" colors */
+    background: linear-gradient(240deg,
+    rgba(0, 153, 255, 0.29) 0%, rgba(59, 180, 241, 0.64) 50%, rgb(0, 161, 255) 100%, /* Initial State */
 
 
+    rgb(0, 159, 253) 100%, rgb(0, 116, 172) 150%, rgb(0, 134, 209) 200%  /* Hover State */
+    );
+
+    /* Set background size to be twice the container width */
+    background-size: 200% auto;
+
+    /* Set the initial position to the left side */
+    background-position: left center;
+
+    /* Add transition for smooth movement */
+    transition: background-position 0.7s ease, width 0.3s ease;
+
+    /* ... other existing styles ... */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -13,8 +28,14 @@
     overflow: hidden;
     position: sticky;
     top: 10px;
-    transition: width 0.3s ease;
     cursor: pointer;
+}
+
+/* Animate the position to the right side on hover */
+.sidebar:hover {
+
+    background-position: right center;
+    /* This now correctly shifts the larger background */
 }
 
 .sidebar.collapsed {
@@ -118,7 +139,7 @@
     display: flex;
     align-items: center;
     gap: 12px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
     transform: translateX(0);
 }
 
@@ -132,7 +153,7 @@
     width: 24px;
     height: 24px;
     flex-shrink: 0;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
 }
 
 .notfocused:hover img {
@@ -158,6 +179,9 @@
     color: black;
     transform: translateX(8px) scale(1.05);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+
+
 }
 
 
@@ -250,4 +274,9 @@
 .sidebar.collapsed .isfocused::before,
 .sidebar.collapsed .isfocused::after {
     display: none;
+}
+.sidebar-content button .isfocused {
+
+    transition: all 1s ease;
+
 }
