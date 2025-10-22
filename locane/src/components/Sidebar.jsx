@@ -16,7 +16,7 @@ import dpIcon from '../assets/dp.jpg';
 import { Turn as Hamburger } from 'hamburger-react';
 import {AdminPanelSettingsRounded, FolderRounded, GpsNotFixedRounded} from "@mui/icons-material";
 import {Divider} from "@mui/material";
-function Sidebar({ changeView, activeView, setShowLogoutDialog,isSuperuser, onProfileClick }) {
+function Sidebar({ changeView, activeView, setActiveDialog, isSuperuser, onProfileClick }) {
       const [isCollapsed, setIsCollapsed] = useState(false);
 
     const doProjects = () => changeView("proj");
@@ -65,7 +65,7 @@ function Sidebar({ changeView, activeView, setShowLogoutDialog,isSuperuser, onPr
                         {!isCollapsed && <span>Administration</span>}
                     </button>
                 )}
-                <button onClick={() => setShowLogoutDialog(true)} className="sidebar-logout">
+                <button onClick={() => setActiveDialog("logout")} className="sidebar-logout">
                     <img src={logoutIcon} alt="Logout" />
                 </button>
             </div>

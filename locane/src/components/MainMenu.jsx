@@ -25,13 +25,14 @@ export default function MainMenu({ setIsLogged, username, isSuperuser, setIsSupe
     const [exportTask, setExportTask] = useState(null);
     const [activeDialog, setActiveDialog] = useState("none");
     const [isViewing, setViewing] = useState(false);
-    const [showLogoutDialog, setShowLogoutDialog] = useState(false);
 
     const [userInfo, setUserInfo] = useState(null);
 
     const [selectedTask, setSelectedTask] = useState(null);
     const [activeProjectId, setActiveProjectId] = useState(null);
     const [filterProjectId, setFilterProjectId] = useState(null);
+    const [deleteProject, setDeleteProject] = useState(null);
+    const [isDeleting, setIsDeleting] = useState(false);
     const { error, success, showError, clearNotifications } = useNotification();
 
     const API_BASE = "/api";
@@ -335,6 +336,27 @@ export default function MainMenu({ setIsLogged, username, isSuperuser, setIsSupe
         }
     };
 
+    const handleDeleteProject = async (project) => {
+        setIsDeleting(true);
+        try {
+            await fetchJSON(`/api/projects/${project.id}/`, {
+                method: "DELETE",
+            });
+            setDeleteProject(null);
+            setActiveDialog("none");
+            await fetchProjects();
+        } catch (err) {
+            showError("Failed to delete project: " + err.message);
+        } finally {
+            setIsDeleting(false);
+        }
+    };
+
+    const onShowDeleteDialog = (project) => {
+        setDeleteProject(project);
+        setActiveDialog("delete-project");
+    };
+
 
 
     return (
@@ -345,7 +367,7 @@ export default function MainMenu({ setIsLogged, username, isSuperuser, setIsSupe
                     changeView={handleViewChange}
                     setIsLogged={setIsLogged}
                     activeView={activeView}
-                    setShowLogoutDialog={setShowLogoutDialog}
+                    setActiveDialog={setActiveDialog}
                     isSuperuser={isSuperuser} // Use prop passed from App.jsx
                     onProfileClick={handleProfileClick}
                 />
@@ -364,6 +386,7 @@ export default function MainMenu({ setIsLogged, username, isSuperuser, setIsSupe
                         fetchProjects={fetchProjects}
                         changeView={handleViewChange}
                         refreshTasks={refreshTasks} // Pass refreshTasks to Projects
+                        onShowDeleteDialog={onShowDeleteDialog}
                     />
                 )}
                 {activeView === "tasks" && (
@@ -426,10 +449,9 @@ export default function MainMenu({ setIsLogged, username, isSuperuser, setIsSupe
                     </div>
                 </div>
             )}
-            {showLogoutDialog && (
+            {activeDialog === "logout" && (
                 <div className="modal-overlay">
                     <div className="dialog no-close">
-
                         <p>Are you sure you want to logout?</p>
                         <div className="logout-dialog-actions">
                             <button onClick={async () => {
@@ -450,7 +472,18 @@ export default function MainMenu({ setIsLogged, username, isSuperuser, setIsSupe
                                     setIsLogged(false);
                                 }
                             }} className="logout-dialog-btn">Yes</button>
-                            <button onClick={() => setShowLogoutDialog(false)} className="logout-dialog-btn no">No</button>
+                            <button onClick={() => setActiveDialog("none")} className="logout-dialog-btn no">No</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {activeDialog === "delete-project" && deleteProject && (
+                <div className="modal-overlay">
+                    <div className="dialog no-close">
+                        <p>Are you sure you want to delete this project?</p>
+                        <div className="delete-dialog-actions">
+                            <button onClick={() => handleDeleteProject(deleteProject)} className="delete-dialog-btn" disabled={isDeleting}>Yes</button>
+                            <button onClick={() => setActiveDialog("none")} className="delete-dialog-btn no" disabled={isDeleting}>No</button>
                         </div>
                     </div>
                 </div>
