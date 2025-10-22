@@ -452,6 +452,7 @@ export default function MainMenu({ setIsLogged, username, isSuperuser, setIsSupe
             {activeDialog === "logout" && (
                 <div className="modal-overlay">
                     <div className="dialog no-close">
+                        <div className="logout-container">
                         <p>Are you sure you want to logout?</p>
                         <div className="logout-dialog-actions">
                             <button onClick={async () => {
@@ -472,7 +473,8 @@ export default function MainMenu({ setIsLogged, username, isSuperuser, setIsSupe
                                     setIsLogged(false);
                                 }
                             }} className="logout-dialog-btn">Yes</button>
-                            <button onClick={() => setActiveDialog("none")} className="logout-dialog-btn no">No</button>
+                            <button onClick={() => setActiveDialog("none")} className="logout-dialog-btn no">Cancel</button>
+                        </div>
                         </div>
                     </div>
                 </div>

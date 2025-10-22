@@ -17,7 +17,7 @@ import { Turn as Hamburger } from 'hamburger-react';
 import {AdminPanelSettingsRounded, FolderRounded, GpsNotFixedRounded} from "@mui/icons-material";
 import {Divider} from "@mui/material";
 import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded';
-
+import LogoutIcon from '@mui/icons-material/Logout';
 function Sidebar({ changeView, activeView, setActiveDialog, isSuperuser, onProfileClick }) {
 
 
@@ -68,7 +68,7 @@ function Sidebar({ changeView, activeView, setActiveDialog, isSuperuser, onProfi
                     </button>
                 )}
                 <button onClick={() => setActiveDialog("logout")} className="sidebar-logout">
-                    <img src={logoutIcon} alt="Logout" />
+                    <LogoutIcon sx={{color:"white", scale:1.2}} />
                 </button>
             </div>
 
