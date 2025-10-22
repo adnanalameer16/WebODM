@@ -133,6 +133,7 @@ function Login({ setIsLogged, setUserDetails }) {
             <h1>WELCOME !</h1>
 
             <form className="login-form" onSubmit={handleSubmit}>
+
                 <div className={"lbl"}>Username</div>
                 <input
                     type="text"
@@ -157,9 +158,9 @@ function Login({ setIsLogged, setUserDetails }) {
             {/* MUI Snackbar for displaying errors */}
             <Snackbar
                 open={!!error}
-                autoHideDuration={6000}
+                autoHideDuration={3000}
                 onClose={handleCloseSnackbar}
-                anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
             >
                 <Alert
                     onClose={handleCloseSnackbar}
