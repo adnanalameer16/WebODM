@@ -16,6 +16,7 @@ import dpIcon from '../assets/dp.jpg';
 import { Turn as Hamburger } from 'hamburger-react';
 import {AdminPanelSettingsRounded, FolderRounded, GpsNotFixedRounded} from "@mui/icons-material";
 import {Divider} from "@mui/material";
+import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded';
 function Sidebar({ changeView, activeView, setShowLogoutDialog,isSuperuser, onProfileClick }) {
       const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -35,11 +36,8 @@ function Sidebar({ changeView, activeView, setShowLogoutDialog,isSuperuser, onPr
                 <Hamburger toggled={isCollapsed} toggle={toggleSidebar} size={20} color="white" />
                 {!isCollapsed && (
                     <button className="dp-icon-btn" onClick={onProfileClick}>
-                        <img 
-                            src={dpIcon} 
-                            alt="Profile" 
-                            className="dp-icon" 
-                        />
+                        <AccountCircleRoundedIcon sx={{color:"white",scale:1.5}} />
+
                     </button>
                 )}
             </div>
