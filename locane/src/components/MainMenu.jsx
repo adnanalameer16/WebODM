@@ -33,6 +33,7 @@ export default function MainMenu({ setIsLogged, username, isSuperuser, setIsSupe
     const [filterProjectId, setFilterProjectId] = useState(null);
     const [deleteProject, setDeleteProject] = useState(null);
     const [isDeleting, setIsDeleting] = useState(false);
+    const [sortBy, setSortBy] = useState('date-desc');
     const { error, success, showError, clearNotifications } = useNotification();
 
     const API_BASE = "/api";
@@ -48,7 +49,28 @@ export default function MainMenu({ setIsLogged, username, isSuperuser, setIsSupe
             setLoading(true);
             const data = await fetchJSON(`${API_PROJECTS}/`);
             const list = Array.isArray(data?.results) ? data.results : data;
-            setProjects(list || []);
+            
+            // Enhance projects with task counts for sorting
+            const enhancedProjects = await Promise.all(
+                (list || []).map(async (project) => {
+                    try {
+                        const tasksResponse = await fetchJSON(`${API_PROJECTS}/${project.id}/tasks/`);
+                        const tasks = Array.isArray(tasksResponse?.results) ? tasksResponse.results : tasksResponse;
+                        return {
+                            ...project,
+                            taskCount: tasks ? tasks.length : 0
+                        };
+                    } catch (err) {
+                        console.warn(`Failed to fetch tasks for project ${project.id}:`, err);
+                        return {
+                            ...project,
+                            taskCount: 0
+                        };
+                    }
+                })
+            );
+            
+            setProjects(enhancedProjects);
         } catch (err) {
             console.error("Fetch projects failed:", err);
         } finally {
@@ -357,6 +379,33 @@ export default function MainMenu({ setIsLogged, username, isSuperuser, setIsSupe
         setActiveDialog("delete-project");
     };
 
+    const sortProjects = useCallback((projectsToSort) => {
+        if (!projectsToSort || projectsToSort.length === 0) return [];
+        
+        const sorted = [...projectsToSort];
+        
+        switch (sortBy) {
+            case 'date-desc':
+                return sorted.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            case 'date-asc':
+                return sorted.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+            case 'name-asc':
+                return sorted.sort((a, b) => a.name.localeCompare(b.name));
+            case 'name-desc':
+                return sorted.sort((a, b) => b.name.localeCompare(a.name));
+            case 'tasks-desc':
+                return sorted.sort((a, b) => (b.taskCount || 0) - (a.taskCount || 0));
+            case 'tasks-asc':
+                return sorted.sort((a, b) => (a.taskCount || 0) - (b.taskCount || 0));
+            default:
+                return sorted;
+        }
+    }, [sortBy]);
+
+    const handleSortChange = (newSortBy) => {
+        setSortBy(newSortBy);
+    };
+
 
 
     return (
@@ -376,7 +425,7 @@ export default function MainMenu({ setIsLogged, username, isSuperuser, setIsSupe
                 {activeView === "gcp" && <GcpInterface />}
                 {activeView === "proj" && (
                     <Projects
-                        projects={projects}
+                        projects={sortProjects(projects)}
                         loading={loading}
                         onAddProject={onAddProject}
                         onAddTask={onAddTask}
@@ -387,6 +436,8 @@ export default function MainMenu({ setIsLogged, username, isSuperuser, setIsSupe
                         changeView={handleViewChange}
                         refreshTasks={refreshTasks} // Pass refreshTasks to Projects
                         onShowDeleteDialog={onShowDeleteDialog}
+                        sortBy={sortBy}
+                        onSortChange={handleSortChange}
                     />
                 )}
                 {activeView === "tasks" && (
