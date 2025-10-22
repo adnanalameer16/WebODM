@@ -1,24 +1,12 @@
 .sidebar {
     height: 92vh;
     width: 18vw;
-    /* Create a gradient that is twice as wide and includes the "hover" colors */
     background: linear-gradient(240deg,
-    rgba(0, 153, 255, 0.29) 0%, rgba(59, 180, 241, 0.64) 50%, rgb(0, 161, 255) 100%, /* Initial State */
-
-
-    rgb(0, 159, 253) 100%, rgb(0, 116, 172) 150%, rgb(0, 134, 209) 200%  /* Hover State */
-    );
-
-    /* Set background size to be twice the container width */
+    rgba(0, 153, 255, 0.29) 0%, rgba(59, 180, 241, 0.64) 50%, rgb(0, 161, 255) 100%,
+    rgb(0, 159, 253) 100%, rgb(0, 116, 172) 150%, rgb(0, 134, 209) 200%);
     background-size: 200% auto;
-
-    /* Set the initial position to the left side */
     background-position: left center;
-
-    /* Add transition for smooth movement */
-    transition: background-position 0.7s ease, width 0.3s ease;
-
-    /* ... other existing styles ... */
+    transition: background-position 0.7s ease, width 0.3s ease, height 0.3s ease, top 0.3s ease;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -31,11 +19,8 @@
     cursor: pointer;
 }
 
-/* Animate the position to the right side on hover */
 .sidebar:hover {
-
     background-position: right center;
-    /* This now correctly shifts the larger background */
 }
 
 .sidebar.collapsed {
@@ -96,8 +81,6 @@
     translate:20px ;
 }
 
-
-
 .profile {
     width: 100%;
     display: flex;
@@ -139,7 +122,6 @@
     display: flex;
     align-items: center;
     gap: 12px;
-
     transform: translateX(0);
 }
 
@@ -153,7 +135,6 @@
     width: 24px;
     height: 24px;
     flex-shrink: 0;
-
 }
 
 .notfocused:hover img {
@@ -179,11 +160,7 @@
     color: black;
     transform: translateX(8px) scale(1.05);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-
-
-
 }
-
 
 .isfocused::before,
 .isfocused::after {
@@ -196,22 +173,17 @@
     display: none;
 }
 
-
-
 .sidebar-content button::before {
     top: -18px;
     box-shadow: 0 8px 0 0 #F0F0F0;
     border-bottom-right-radius: 50px;
-    
 }
-
 
 .sidebar-content button::after {
     bottom: -18px;
     box-shadow: 0 -8px 0 0 #F0F0F0; 
     border-top-right-radius: 50px;
 }
-
 
 .isfocused::before,
 .isfocused::after {
@@ -223,10 +195,8 @@
     width: 100%;
 }
 
-
 .sidebar-logout {
     margin-top: 24px;
-
     padding: 10px;
     background: transparent;
     border: none;
@@ -249,7 +219,6 @@
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .logout-container{
-
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -263,7 +232,6 @@
   gap: 1rem;
   justify-content: space-between;
     width: 100%;
-
 }
 .logout-dialog-btn {
   background: #CC0000;
@@ -290,7 +258,76 @@
     display: none;
 }
 .sidebar-content button .isfocused {
-
     transition: all 1s ease;
+}
 
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 100vw;
+        height: 80px;
+        flex-direction: row;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        margin: 0;
+        border-radius: 0;
+        padding: 0 20px;
+        top: auto;
+        z-index: 1000;
+    }
+
+    .sidebar.collapsed {
+        width: 100vw;
+        min-width: unset;
+        padding-right: 20px;
+    }
+
+    .sidebar-header, .profile, .sidebar-logout, .sidebar-empty-space {
+        display: none;
+    }
+
+    .sidebar-content {
+        flex-direction: row;
+        justify-content: space-around;
+        align-items: center;
+        padding: 0;
+        height: 100%;
+    }
+
+    .sidebar-content button {
+        flex-direction: column;
+        padding: 8px;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        gap: 4px;
+        max-width: none;
+        transform: none !important;
+        box-shadow: none !important;
+    }
+
+    .sidebar.collapsed .sidebar-content button {
+        margin-right: 0;
+    }
+
+    .isfocused {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+    }
+
+    .isfocused::before, .isfocused::after {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .sidebar-content button {
+        font-size: 0.7rem;
+        padding: 6px;
+    }
+
+    .sidebar-content button img {
+        width: 20px;
+        height: 20px;
+    }
 }

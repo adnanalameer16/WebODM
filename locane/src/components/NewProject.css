@@ -1,16 +1,16 @@
-.description textarea{
-    width: 95%;
+.description textarea {
+    width: 100%;
     margin-bottom: 1.25rem;
     padding: 0.9rem;
     border: 2px solid #e2e8f0;
     border-radius: 8px;
     font-size: 1rem;
     transition: border-color 0.2s ease;
-    resize: None;
-
-
+    resize: vertical;
+    box-sizing: border-box;
 }
-.project-container{
+
+.project-container {
     display: flex;
     flex-direction: column;
     width: 100%;
@@ -19,185 +19,144 @@
     box-sizing: border-box;
     gap: 1rem;
 }
-.title{
-    margin:0;
+
+.title {
+    margin: 0;
 }
-.card-header{
+
+.card-header {
     display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: flex-start;
-    column-gap: 1.5rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
 
+.projectName {
+    height: 50px;
+    width: 100%;
+    font-size: 1.5rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    transition: border-color 0.2s ease;
+    resize: none;
+    box-sizing: border-box;
+}
 
-
- }
- .projectName{
-     height: 50px;
-     width: 400px;
-     font-size: xx-large;
-
-
-
-     border: 2px solid #e2e8f0;
-     border-radius: 8px;
-
-     transition: border-color 0.2s ease;
-     resize: None;
-
-
-
-
- }
-.submit-button {
+.submit-button,
+.cancel-button {
     padding: 0.85rem 1.75rem;
-    border: 1px solid #e2e8f0 !important;
     border-radius: 8px;
     cursor: pointer;
     font-weight: bold;
     transition: all 0.2s ease;
     font-size: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+.submit-button {
+    border: 1px solid #e2e8f0 !important;
     background: rgba(0, 123, 255, 0) !important;
     color: #000000;
-
-
-
-
 }
+
 .submit-button:hover {
-
     background: rgba(0, 157, 255, 0.24) !important;
-    transition: border-color 0.2s ease;
     border-color: rgba(0, 0, 0, 0.18) !important;
 }
+
 .cancel-button {
-
     border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: all 0.2s ease;
-    font-size: 1rem;
     background: rgba(135, 135, 135, 0.17) !important;
-
-    height: 100%;
     margin: 0 !important;
-    padding: 0.85rem 1.75rem !important;
-    margin-right: 10px !important;
 }
+
 .cancel-button:hover {
-
     background: rgba(97, 97, 97, 0.45) !important;
-    transition: border-color 0.2s ease;
-    border-color: rgba(0, 0, 0, 0.18) !important;
 }
 
-
- .tags{
-
-     height: 30px;
-     width: 30%;
-
- }
- .preview-image{
-     width :100%;
-     height:100%;
-     aspect-ratio: 1 / 1;
-     margin: 4px;
-     object-fit: fill;
-
-
-
-
-
-
- }
- .cloud{
-
-     height: 50%;
-     width: auto;
-
-
-
- }
- .cloud img{
-
-     width: 100%;
-     height: 100%;
-     object-fit: cover;
-
- }
- .cloud img:hover{
-
- }
-.upload-card{
-    display: flex;
-    flex-direction: row;
-    width: 90vw; 
-    max-width: 600px; 
-    height: 50vh; 
-    max-height: 400px; 
-    justify-content: space-between;
-    align-items: center;
-
-    padding: 10px; 
-    box-sizing: border-box;
-    margin: 0 auto; 
+.tags {
+    height: 30px;
+    width: 100%;
 }
-.file-count{
-    margin-left: 1rem;
-    opacity: 50%;
 
+.preview-image {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    margin: 4px 0;
+    object-fit: cover;
 }
-.upload-content{
 
-
-
+.cloud {
+    height: auto;
+    width: 100%;
 }
-.action-task{
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
 
-}
-.upload
-{
+.cloud img {
     width: 100%;
     height: 100%;
+    object-fit: cover;
+}
 
-    margin-right: 5px;
+.upload-card {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: auto;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    box-sizing: border-box;
+    margin: 0 auto;
+    gap: 1rem;
+}
+
+.file-count {
+    margin-left: 0;
+    opacity: 0.5;
+    align-self: flex-start;
+}
+
+.action-task {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 100%;
+    gap: 10px;
+}
+
+.upload {
+    width: 100%;
+    min-height: 150px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-
     background-color: var(--button-bg);
     border-radius: 25px;
     border-style: dashed;
     border-width: 3px;
     border-color: rgba(100, 149, 237, 0.2);
     opacity: 0.7;
-    transition: background-color 0.3s ease, border-color 0.3s ease;
-
+    transition: background-color 0.3s ease, border-color 0.3s ease, opacity 0.3s ease;
 }
-.upload:hover{
+
+.upload:hover {
     opacity: 1;
-    transition: opacity 0.3s  ease;
-
 }
 
-.Upload-text{
-
+.Upload-text {
     margin: 10%;
     margin-top: 0;
     text-align: center;
     opacity: 40%;
-
-
 }
+
 .upload:hover {
     background-color: var(--button-hover-bg);
-
 }
 
 .upload-btn {
@@ -205,52 +164,45 @@
     font-size: 20px;
     cursor: pointer;
     background-color: var(--panel-color);
-
     border-radius: 16px;
-    transition: background-color 0.3s ease, border-color 0.3s ease; 
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .upload-btn:hover {
     background-color: var(--button-hover-bg);
-
 }
 
-.images{
+.images {
     width: 100%;
-    height: 100%;
-
-    justify-content: space-between;
+    height: 200px;
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
     gap: 10px;
-    margin-left:5%;
     overflow-y: auto;
-    overflow-x:visible;
     padding: 10px;
     box-sizing: border-box;
     background-color: var(--panel-color);
-    align-content: space-evenly;
 }
-.description{
 
+.description {
     display: flex;
     flex-direction: column;
-
 }
-.card{
+
+.card {
     width: 100%;
     height: 100%;
     background-color: #ffffff;
     padding: 20px;
     border-radius: 15px;
-
-
+    box-sizing: border-box;
 }
+
 .thumbnail {
     position: relative;
-    border:none !important;
+    border: none !important;
     padding: 0;
-    overflow: visible !important;
+    overflow: hidden !important;
 }
 
 .thumbnail img {
@@ -258,4 +210,34 @@
     height: auto;
     display: block;
 }
+
+@media (min-width: 600px) {
+    .card-header {
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .projectName {
+        width: 400px;
+    }
+
+    .action-task {
+        flex-direction: row;
+    }
+
+    .submit-button,
+    .cancel-button {
+        width: auto;
+    }
+
+    .upload-card {
+        flex-direction: row;
+    }
+
+    .images {
+        height: 100%;
+        margin-left: 5%;
+    }
+}
+
 

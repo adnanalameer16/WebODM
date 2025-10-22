@@ -1,20 +1,41 @@
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
 :root {
     --body-bg-color: #f0f0f0;
+    --primary-color: #007bff;
+    --secondary-color: #6c757d;
+    --background-color: #f8f9fa;
+    --font-color: #333;
+    --border-color: #dee2e6;
+    --spacing-unit: 8px;
 }
 
 
 body {
     background-color: var(--body-bg-color);
     font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
     margin: 0;
+    overflow-x: hidden;
 }
 .App {
     display: flex;
+    flex-direction: row;
     height: 100vh;
     width: 100vw;
     overflow: hidden;
 }
 
+/* For tablets */
+@media (max-width: 768px) {
+    .App {
+        flex-direction: column;
+    }
+}
+
+/* For mobile phones */
+@media (max-width: 480px) {
+    body {
+        font-size: 14px;
+    }
+}

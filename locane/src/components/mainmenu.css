@@ -1,17 +1,16 @@
-.main-menu
-{
+.main-menu {
     display: flex;
     flex-direction: row;
     width: 100%;
     height: 100%;
     --sidebar-total-width: calc(18vw + 20px);
 }
+
 .user-info {
     line-height: 1.5;
     margin: 10px;
     display: flex;
     flex-direction: column;
-
 }
 
 .user-info h2 {
@@ -21,11 +20,11 @@
     margin-top: 0;
     margin-bottom: 25px;
     padding-bottom: 10px;
-    border-bottom: 1px solid #eee; /* Subtle separator */
+    border-bottom: 1px solid #eee;
 }
 
 .user-info p {
-    display: flex; /* Use flex for clean alignment of key/value pairs */
+    display: flex;
     justify-content: space-between;
     margin: 12px 0;
     font-size: 0.95em;
@@ -35,41 +34,41 @@
 .user-info p strong {
     font-weight: 600;
     color: #333;
-    min-width: 150px; /* Ensures the labels align consistently */
+    min-width: 150px;
     margin-right: 15px;
 }
 
-/* Styling for the Status Field */
 .user-info p:nth-child(2) span {
-    /* Assuming the status is wrapped in a <span> for dynamic styling */
     font-weight: 700;
     padding: 3px 8px;
     border-radius: 6px;
 }
 
-.user-info p:nth-child(2) span[style*="Active"] { /* Target 'Active' status */
-    color: #1a73e8; /* Blue for active */
+.user-info p:nth-child(2) span[style*="Active"] {
+    color: #1a73e8;
     background-color: #e6f0ff;
 }
 
-.user-info p:nth-child(2) span[style*="Inactive"] { /* Target 'Inactive' status */
-    color: #e94235; /* Red for inactive */
+.user-info p:nth-child(2) span[style*="Inactive"] {
+    color: #e94235;
     background-color: #fce8e6;
 }
-/* Update variables when sidebar is collapsed */
+
 .main-menu:has(.sidebar.collapsed) {
     --sidebar-total-width: 100px;
 }
-.sidebar-menu{
+
+.sidebar-menu {
     position: fixed;
     top: 0;
     left: 0;
     height: 100vh;
     width: var(--sidebar-total-width, 20vw);
     transition: width 0.3s ease;
+    z-index: 100;
 }
-.dialog-close {
 
+.dialog-close {
     position: fixed;
     top: 0;
     right: 0;
@@ -77,21 +76,24 @@
     background-color: rgba(255, 222, 173, 0) !important;
     border-radius: 100%;
     color: rgba(0, 0, 0, 0.17);
-
 }
-.dialog-close:hover {
 
+.dialog-close:hover {
     background-color: rgba(0, 0, 0, 0) !important;
     border-radius: 50%;
     color: rgba(0, 0, 0, 0.77);
-    scale: 1.2}
-.main-view{
+    scale: 1.2;
+}
+
+.main-view {
     flex: 1;
     margin-left: var(--sidebar-total-width, 20vw);
     height: 100vh;
     overflow-y: auto;
     transition: margin-left 0.3s ease;
+    padding-bottom: 80px; /* Add padding to avoid content being hidden by the bottom bar */
 }
+
 .modal-overlay {
     background: rgba(0, 0, 0, 0.3);
     position: fixed;
@@ -101,6 +103,7 @@
     width: 100%;
     height: 100%;
 }
+
 .dialog {
     position: fixed;
     left: 50%;
@@ -108,11 +111,49 @@
     transform: translate(-50%, -50%);
     background: #fff;
     padding: 30px 10px;
-    max-width: 65vw;
+    width: 90vw;
+    max-width: 600px;
     max-height: 85vh;
     overflow: auto;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
     border: 1px solid #e2e8f0;
     border-radius: 12px;
     z-index: 1001;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .main-menu {
+        flex-direction: column;
+    }
+
+    .sidebar-menu {
+        width: 100%;
+        height: auto;
+        position: relative;
+    }
+
+    .main-view {
+        margin-left: 0;
+        padding-bottom: 100px; /* Adjust for bottom nav bar */
+    }
+
+    .main-menu:has(.sidebar.collapsed) {
+        --sidebar-total-width: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .dialog {
+        width: 95vw;
+        padding: 20px 5px;
+    }
+
+    .user-info h2 {
+        font-size: 1.4em;
+    }
+
+    .user-info p {
+        font-size: 0.9em;
+    }
 }
