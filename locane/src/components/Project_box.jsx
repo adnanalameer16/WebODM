@@ -72,11 +72,22 @@ const ProjectBox = ({ project, onAddTask, onEditProject, onShowDeleteDialog, cha
     fetchTasksAndProgress();
   }, [project.id, refreshTasks]); // Added refreshTasks as a dependency to re-run useEffect when tasks are updated
 
-  const handleEdit = () => {
+  const handleEdit = async () => {
+    const isCurrentlySubscribed = await checkSubscriptionStatus();
+    if (!isCurrentlySubscribed) {
+      alert('Subscription required');
+      return;
+    }
     setIsEditing(true);
   };
 
   const handleSave = async () => {
+    const isCurrentlySubscribed = await checkSubscriptionStatus();
+    if (!isCurrentlySubscribed) {
+      alert('Subscription required');
+      return;
+    }
+    
     try {
       const response = await authorizedFetch(`/api/projects/${project.id}/`, {
         method: "PATCH",

@@ -542,24 +542,25 @@ export default function MainMenu({ setIsLogged, username, isSuperuser, setIsSupe
             {activeDialog==='user' && userInfo && (
                 <div className="modal-overlay">
                     <div className="dialog">
+                        <div className="user-info">
                         <h2>User Information</h2>
                         <p><strong>Name:</strong> {userInfo.name}</p>
                         <p><strong>Subscription Status:</strong> {userInfo.subscriptionStatus}</p>
                         {userInfo.subscriptionStatus === 'Active' && (
                             <>
                                 <p><strong>Subscription Start:</strong> {
-                                    userInfo.subscriptionStartDate 
+                                    userInfo.subscriptionStartDate
                                         ? new Date(userInfo.subscriptionStartDate).toLocaleString()
                                         : 'Unlimited (Admin)'
                                 }</p>
                                 <p><strong>Subscription End:</strong> {
-                                    userInfo.subscriptionEndDate 
+                                    userInfo.subscriptionEndDate
                                         ? new Date(userInfo.subscriptionEndDate).toLocaleString()
                                         : 'Unlimited (Admin)'
                                 }</p>
                             </>
                         )}
-
+                        </div>
                     </div>
                 </div>
             )}
