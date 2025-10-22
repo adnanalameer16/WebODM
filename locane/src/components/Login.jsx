@@ -4,16 +4,16 @@ import { getCookie } from "../utils/cookieUtils";
 import { authorizedFetch } from "../utils/api";
 import logo from "../assets/logo.png";
 
-// Import MUI components for error notifications
-import Snackbar from "@mui/material/Snackbar";
-import Alert from "@mui/material/Alert";
+// Import reusable notification components
+import NotificationSnackbar from "./NotificationSnackbar";
+import { useNotification } from "../hooks/useNotification";
 
 function Login({ setIsLogged, setUserDetails }) {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
     const [csrfToken, setCsrfToken] = useState("");
-    const [error, setError] = useState(null); // State to hold the error message
+    const { error, success, showError, clearNotifications } = useNotification();
 
     useEffect(() => {
         const getCsrfToken = async () => {
@@ -28,7 +28,7 @@ function Login({ setIsLogged, setUserDetails }) {
             } catch (error) {
                 console.error("Could not fetch CSRF token:", error);
                 // Set user-facing error
-                setError("Could not initialize login. Please refresh the page.");
+                showError("Could not initialize login. Please refresh the page.");
             }
         };
 
@@ -38,10 +38,10 @@ function Login({ setIsLogged, setUserDetails }) {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-        setError(null); // Clear any previous errors on a new attempt
+        clearNotifications(); // Clear any previous errors on a new attempt
 
         if (!csrfToken) {
-            setError("Could not verify security token. Please refresh and try again.");
+            showError("Could not verify security token. Please refresh and try again.");
             setLoading(false);
             return;
         }
@@ -109,23 +109,17 @@ function Login({ setIsLogged, setUserDetails }) {
                     data?.error ||
                     `HTTP ${response.status}: ${response.statusText || "Login failed"}`;
                 console.error("Login failed:", msg);
-                setError("Login failed: " + msg); // Replaced alert
+                showError("Login failed: " + msg);
             }
         } catch (error) {
             console.error("An error occurred during login:", error);
-            setError("An error occurred. Please try again later."); // Replaced alert
+            showError("An error occurred. Please try again later.");
         } finally {
             setLoading(false);
         }
     };
 
-    // Handler to close the snackbar
-    const handleCloseSnackbar = (event, reason) => {
-        if (reason === "clickaway") {
-            return;
-        }
-        setError(null);
-    };
+
 
     return (
         <div className="login-container">
@@ -154,22 +148,12 @@ function Login({ setIsLogged, setUserDetails }) {
                 </button>
             </form>
 
-            {/* MUI Snackbar for displaying errors */}
-            <Snackbar
-                open={!!error}
-                autoHideDuration={6000}
-                onClose={handleCloseSnackbar}
-                anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-            >
-                <Alert
-                    onClose={handleCloseSnackbar}
-                    severity="error"
-                    variant="filled"
-                    sx={{ width: "100%" }}
-                >
-                    {error}
-                </Alert>
-            </Snackbar>
+            {/* Notification Snackbar */}
+            <NotificationSnackbar 
+                error={error}
+                success={success}
+                onClose={clearNotifications}
+            />
         </div>
     );
 }

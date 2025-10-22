@@ -10,6 +10,10 @@ import Login from './Login';
 import { authorizedFetch } from '../utils/api.js';
 import CloseIcon from "@mui/icons-material/Close";
 
+// Import reusable notification components
+import NotificationSnackbar from "./NotificationSnackbar";
+import { useNotification } from "../hooks/useNotification";
+
 const MapBoundsUpdater = ({ bounds }) => { 
     const map = useMap(); 
     useEffect(() => { 
@@ -48,7 +52,8 @@ function GcpInterface() {
     const [loggedOut, setLoggedOut] = useState(false); 
     const gcpInputRef = useRef(null); 
     const imageInputRef = useRef(null); 
-    const navigate = useNavigate(); 
+    const navigate = useNavigate();
+    const { error, success, showError, clearNotifications } = useNotification(); 
 
     // Helper function for real-time subscription check
     const checkSubscriptionStatus = async () => {
@@ -239,6 +244,8 @@ function GcpInterface() {
         return <Login />; 
     } 
 
+
+
     // --- Component JSX (updated structure and content) --- 
 
     return ( 
@@ -306,7 +313,7 @@ function GcpInterface() {
                         <button className="ui-match-button choose-images" onClick={async () => {
                             const isCurrentlySubscribed = await checkSubscriptionStatus();
                             if (!isCurrentlySubscribed) {
-                                alert('Subscription required');
+                                showError('Subscription required');
                                 return;
                             }
                             imageInputRef.current.click();
@@ -323,7 +330,7 @@ function GcpInterface() {
                         <button className="ui-match-button load-gcp" onClick={async () => {
                             const isCurrentlySubscribed = await checkSubscriptionStatus();
                             if (!isCurrentlySubscribed) {
-                                alert('Subscription required');
+                                showError('Subscription required');
                                 return;
                             }
                             gcpInputRef.current.click();
@@ -415,6 +422,13 @@ function GcpInterface() {
                     </MapContainer> 
                 </div> 
             </div> 
+
+            {/* Notification Snackbar */}
+            <NotificationSnackbar 
+                error={error}
+                success={success}
+                onClose={clearNotifications}
+            />
         </div> 
     ); 
 } 

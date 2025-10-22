@@ -5,7 +5,13 @@ import Badge from "@mui/material/Badge"
 import Button from "@mui/material/Button";
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import SettingsIcon from '@mui/icons-material/Settings';
+
+// Import reusable notification components
+import NotificationSnackbar from "./NotificationSnackbar";
+import { useNotification } from "../hooks/useNotification";
+import { useState } from "react";
 function Upload({ imageFiles, setImageFiles, onDelete, changeView, exit, gcpFile, setGcpFile }) {
+    const { error, success, showError, clearNotifications } = useNotification();
 
     const handleFileSelect = (e) => {
         const chosenFiles = Array.from(e.target.files);
@@ -21,9 +27,11 @@ function Upload({ imageFiles, setImageFiles, onDelete, changeView, exit, gcpFile
         if (file && file.type === "text/plain") {
             setGcpFile(file);
         } else {
-            alert("Please select a valid .txt file");
+            showError("Please select a valid .txt file");
         }
     };
+
+
 
     return (
         <>
@@ -120,6 +128,13 @@ function Upload({ imageFiles, setImageFiles, onDelete, changeView, exit, gcpFile
                     </Button>
                 </div>
             </div>
+
+            {/* Notification Snackbar */}
+            <NotificationSnackbar 
+                error={error}
+                success={success}
+                onClose={clearNotifications}
+            />
         </>
     );
 }

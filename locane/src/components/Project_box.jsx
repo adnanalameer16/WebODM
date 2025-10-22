@@ -14,6 +14,10 @@ import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
 import {ArrowRight} from "@mui/icons-material";
 import Tasks from "./Tasks.jsx";
 
+// Import reusable notification components
+import NotificationSnackbar from "./NotificationSnackbar";
+import { useNotification } from "../hooks/useNotification";
+
 
 const ProjectBox = ({ project, onAddTask, onEditProject, onShowDeleteDialog, changeView, refreshTasks }) => {
   const [hovering,setHover]=useState(false);
@@ -25,6 +29,7 @@ const ProjectBox = ({ project, onAddTask, onEditProject, onShowDeleteDialog, cha
   const [Progress, setProgress] = useState(null);
   const [CompletedTasks, setCompletedTasks] = useState(0);
   const [Tasks, setTasks] = useState(0);
+  const { error, success, showError, clearNotifications } = useNotification();
 
   // Helper function for real-time subscription check
   const checkSubscriptionStatus = async () => {
@@ -96,6 +101,8 @@ const ProjectBox = ({ project, onAddTask, onEditProject, onShowDeleteDialog, cha
     setEditedDescription(project.description || "");
     setIsEditing(false);
   };
+
+
 
   return (
     <div className="project-box-outer" onMouseEnter={() => setHover(true)} onMouseLeave={()=>{setHover(false)}}>
@@ -210,7 +217,7 @@ const ProjectBox = ({ project, onAddTask, onEditProject, onShowDeleteDialog, cha
                               onClick={async () => {
                                   const isCurrentlySubscribed = await checkSubscriptionStatus();
                                   if (!isCurrentlySubscribed) {
-                                      alert('Subscription required');
+                                      showError('Subscription required');
                                       return;
                                   }
                                   onAddTask(project.id);
@@ -231,8 +238,12 @@ const ProjectBox = ({ project, onAddTask, onEditProject, onShowDeleteDialog, cha
 
       </div>
 
-
-
+      {/* Notification Snackbar */}
+      <NotificationSnackbar 
+        error={error}
+        success={success}
+        onClose={clearNotifications}
+      />
     </div>
   );
 };

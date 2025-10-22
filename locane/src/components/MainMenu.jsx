@@ -11,10 +11,14 @@ import { authorizedFetch } from '../utils/api.js';
 import Admin from './Admin.jsx';
 import CloseButton from 'react-bootstrap/CloseButton';
 import { getCookie } from '../utils/cookieUtils';
+
+// Import reusable notification components
+import NotificationSnackbar from "./NotificationSnackbar";
+import { useNotification } from "../hooks/useNotification";
 // logoutSession removed; using authorizedFetch directly
 
 export default function MainMenu({ setIsLogged, username, isSuperuser, setIsSuperuser }) {
-    const [activeView, setActiveView] = useState("dash");
+    const [activeView, setActiveView] = useState("proj");
     const [projects, setProjects] = useState([]);
     const [loading, setLoading] = useState(false);
     const [runningTasks, setRunningTasks] = useState([]);
@@ -28,6 +32,7 @@ export default function MainMenu({ setIsLogged, username, isSuperuser, setIsSupe
     const [selectedTask, setSelectedTask] = useState(null);
     const [activeProjectId, setActiveProjectId] = useState(null);
     const [filterProjectId, setFilterProjectId] = useState(null);
+    const { error, success, showError, clearNotifications } = useNotification();
 
     const API_BASE = "/api";
     const API_PROJECTS = `${API_BASE}/projects`;
@@ -248,7 +253,7 @@ export default function MainMenu({ setIsLogged, username, isSuperuser, setIsSupe
     const onAddProject = async () => {
         const isCurrentlySubscribed = await checkSubscriptionStatus();
         if (!isCurrentlySubscribed) {
-            alert('Subscription required');
+            showError('Subscription required');
             return;
         }
         setActiveDialog("create-project");
@@ -256,7 +261,7 @@ export default function MainMenu({ setIsLogged, username, isSuperuser, setIsSupe
     const onAddTask = async (projectId) => {
         const isCurrentlySubscribed = await checkSubscriptionStatus();
         if (!isCurrentlySubscribed) {
-            alert('Subscription required');
+            showError('Subscription required');
             return;
         }
         setActiveProjectId(projectId);
@@ -330,6 +335,8 @@ export default function MainMenu({ setIsLogged, username, isSuperuser, setIsSupe
         }
     };
 
+
+
     return (
         <div className="main-menu">
             <DialogueManager />
@@ -344,7 +351,6 @@ export default function MainMenu({ setIsLogged, username, isSuperuser, setIsSupe
                 />
             </div>
             <div className="main-view">
-                {activeView === "dash" && <h1>Dashboard</h1>}
                 {activeView === "gcp" && <GcpInterface />}
                 {activeView === "proj" && (
                     <Projects
@@ -473,6 +479,13 @@ export default function MainMenu({ setIsLogged, username, isSuperuser, setIsSupe
                     </div>
                 </div>
             )}
+
+            {/* Notification Snackbar */}
+            <NotificationSnackbar 
+                error={error}
+                success={success}
+                onClose={clearNotifications}
+            />
         </div>
     );
 }

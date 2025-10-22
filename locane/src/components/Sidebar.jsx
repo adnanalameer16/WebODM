@@ -19,7 +19,6 @@ import {Divider} from "@mui/material";
 function Sidebar({ changeView, activeView, setShowLogoutDialog,isSuperuser, onProfileClick }) {
       const [isCollapsed, setIsCollapsed] = useState(false);
 
-    const doDashboard = () => changeView("dash");
     const doProjects = () => changeView("proj");
     const doTasks = () => changeView("tasks");
     const doGcp = () => changeView("gcp");
@@ -48,10 +47,6 @@ function Sidebar({ changeView, activeView, setShowLogoutDialog,isSuperuser, onPr
             </div>
             <Divider />
             <div className="sidebar-content" >
-                <button className={activeView === "dash" ? "isfocused" : "notfocused"} onClick={doDashboard}>
-                    <HomeRounded />
-                    {!isCollapsed && <span>Dashboard</span>}
-                </button>
                 <button className={activeView === "proj" ? "isfocused" : "notfocused"} onClick={doProjects}>
                     <FolderRounded/>
                     {!isCollapsed && <span>Projects</span>}

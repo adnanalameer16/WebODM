@@ -10,6 +10,10 @@ import axios from 'axios'
 import {getCookie} from "../utils/cookieUtils.js";
 import './Tasks.css'
 import CloseButton from 'react-bootstrap/CloseButton';
+
+// Import reusable notification components
+import NotificationSnackbar from "./NotificationSnackbar";
+import { useNotification } from "../hooks/useNotification";
 function Map_Prev({ images }) {
     const [positions, setPositions] = useState([]);
 
@@ -213,19 +217,17 @@ export default function CreateNewTask({ exit, redirect, projectId, onTaskCreated
     const [gcpFile, setGcpFile] = useState(null);
     const [step, setStep] = useState(1);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [error, setError] = useState(null);
-    const [success, setSuccess] = useState(null);
+    const { error, success, showError, showSuccess, clearNotifications } = useNotification();
     const [progress,setProgress]=useState(0.0);
 
     const nextStep = () => {
         if (step === 1) {
             if (imageFiles.length < 2) {
                 const msg = "At least two images are required to proceed.";
-                setError(msg);
-                alert(msg);
+                showError(msg);
                 return;
             }
-            setError(null);
+            clearNotifications();
         }
         setStep(s => (s < 2 ? s + 1 : s));
     };
@@ -256,7 +258,7 @@ export default function CreateNewTask({ exit, redirect, projectId, onTaskCreated
             });
             console.log("Response:", response.data);
             const id=response.data.id
-            setSuccess("Task created successfully!");
+            showSuccess("Task created successfully!");
             if (onTaskCreated) {
                 onTaskCreated(); // Notify parent component about task creation
             }
@@ -266,9 +268,9 @@ export default function CreateNewTask({ exit, redirect, projectId, onTaskCreated
         } catch (err) {
             // err.response has backend info if available
             if (err.response) {
-                setError(`Failed: ${err.response.status} - ${err.response.data?.detail || err.message}`);
+                showError(`Failed: ${err.response.status} - ${err.response.data?.detail || err.message}`);
             } else {
-                setError(err.message);
+                showError(err.message);
             }
         }
 
@@ -317,7 +319,7 @@ export default function CreateNewTask({ exit, redirect, projectId, onTaskCreated
             const responses = await Promise.all(uploadPromises);
 
             console.log("All files uploaded successfully! ✅");
-            setSuccess("Uploading Complete");
+            showSuccess("Uploading Complete");
             responses.forEach(response => {
                 console.log(response.data);
             });
@@ -356,8 +358,7 @@ export default function CreateNewTask({ exit, redirect, projectId, onTaskCreated
 
     const startTask = async (formData) => {
         setIsSubmitting(true);
-        setError(null);
-        setSuccess(null);
+        clearNotifications();
 
         createTask(formData);
 
@@ -372,13 +373,15 @@ export default function CreateNewTask({ exit, redirect, projectId, onTaskCreated
         setImageFiles(updatedImageFiles);
 
         if (updatedImageFiles.length < 2) {
-            setError("At least two images are required to proceed.");
+            showError("At least two images are required to proceed.");
         } else {
-            setError(null);
+            clearNotifications();
         }
     };
 
     const imagesForMap = imageFiles.map(item => item.file);
+
+
 
     return (
         <div>
@@ -450,6 +453,13 @@ export default function CreateNewTask({ exit, redirect, projectId, onTaskCreated
 
             </button>
         </div>
+
+            {/* Notification Snackbar */}
+            <NotificationSnackbar 
+                error={error}
+                success={success}
+                onClose={clearNotifications}
+            />
         </div>
     );
 }

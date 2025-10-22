@@ -3,6 +3,10 @@ import ReactDOM from 'react-dom';
 import './Export.css';
 import { authorizedFetch } from '../utils/api.js';
 
+// Import reusable notification components
+import NotificationSnackbar from "./NotificationSnackbar";
+import { useNotification } from "../hooks/useNotification";
+
 function Export({ projectId, taskId, onClose, openExportTaskId, setOpenExportTaskId }) {
     const [assets, setAssets] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -30,6 +34,7 @@ function Export({ projectId, taskId, onClose, openExportTaskId, setOpenExportTas
     const [exportStatus, setExportStatus] = useState('');
 	const [downloadProgress, setDownloadProgress] = useState(null);
 	const [hasContentLength, setHasContentLength] = useState(null);
+    const { error, success, showError, clearNotifications } = useNotification();
 
     useEffect(() => {
         authorizedFetch(`/api/projects/${projectId}/tasks/${taskId}/`)
@@ -334,7 +339,7 @@ function Export({ projectId, taskId, onClose, openExportTaskId, setOpenExportTas
 	const toggleDropdown = async () => {
 		const isCurrentlySubscribed = await checkSubscriptionStatus();
 		if (!isCurrentlySubscribed) {
-			alert('Subscription required');
+			showError('Subscription required');
 			return;
 		}
 		if (isDropdownVisible) {
@@ -343,6 +348,8 @@ function Export({ projectId, taskId, onClose, openExportTaskId, setOpenExportTas
 			setOpenExportTaskId(taskId);
 		}
 	};
+
+
 
 	return (
         <div className="export-container">
@@ -391,6 +398,13 @@ function Export({ projectId, taskId, onClose, openExportTaskId, setOpenExportTas
 				</div>,
 				document.body
 			)}
+
+            {/* Notification Snackbar */}
+            <NotificationSnackbar 
+                error={error}
+                success={success}
+                onClose={clearNotifications}
+            />
         </div>
     );
 }

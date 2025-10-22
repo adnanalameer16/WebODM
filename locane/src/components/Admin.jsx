@@ -2,6 +2,10 @@ import React, { useState, useEffect } from 'react';
 import './admin.css'
 import { authorizedFetch } from '../utils/api';
 
+// Import reusable notification components
+import NotificationSnackbar from "./NotificationSnackbar";
+import { useNotification } from "../hooks/useNotification";
+
 function Admin({ changeView, isSuperuser }) {
     const [users, setUsers] = useState([]);
     const [showDeletePopup, setShowDeletePopup] = useState(false);
@@ -31,6 +35,7 @@ function Admin({ changeView, isSuperuser }) {
         confirmPassword: ''
     });
     const [originalFormData, setOriginalFormData] = useState(null);
+    const { error, success, showError, showSuccess, clearNotifications } = useNotification();
 
     useEffect(() => {
         fetchUsers();
@@ -83,7 +88,7 @@ function Admin({ changeView, isSuperuser }) {
 
     const handleSaveUser = async () => {
         if (!currentUser && formData.password !== confirmPassword) {
-            alert('Passwords do not match!');
+            showError('Passwords do not match!');
             return;
         }
 
@@ -115,7 +120,7 @@ function Admin({ changeView, isSuperuser }) {
             closeUserDialog();
         } catch (error) {
             console.error('Error saving user:', error);
-            alert('Error saving user');
+            showError('Error saving user');
         }
     };
 
@@ -178,11 +183,11 @@ function Admin({ changeView, isSuperuser }) {
 
     const handleUpdatePassword = async () => {
         if (passwordData.newPassword !== passwordData.confirmPassword) {
-            alert('Passwords do not match!');
+            showError('Passwords do not match!');
             return;
         }
         if (!passwordData.newPassword) {
-            alert('Password cannot be empty!');
+            showError('Password cannot be empty!');
             return;
         }
         try {
@@ -191,12 +196,12 @@ function Admin({ changeView, isSuperuser }) {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ new_password: passwordData.newPassword }),
             });
-            alert('Password updated successfully!');
+            showSuccess('Password updated successfully!');
             setShowPasswordDialog(false);
             setPasswordData({ newPassword: '', confirmPassword: '' });
         } catch (error) {
             console.error('Error updating password:', error);
-            alert('Error updating password');
+            showError('Error updating password');
         }
     };
 
@@ -213,6 +218,8 @@ function Admin({ changeView, isSuperuser }) {
         setShowPasswordDialog(false);
         setCurrentUser(null);
     };
+
+
 
     return (
         <div className="admin">
@@ -428,6 +435,13 @@ function Admin({ changeView, isSuperuser }) {
                     </div>
                 </div>
             )}
+
+            {/* Notification Snackbar */}
+            <NotificationSnackbar 
+                error={error}
+                success={success}
+                onClose={clearNotifications}
+            />
         </div>
     );
 }

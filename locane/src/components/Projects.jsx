@@ -5,9 +5,14 @@ import './Projects.css';
 import AddIcon from "@mui/icons-material/Add";
 import {Grid, Skeleton} from "@mui/material";
 
+// Import reusable notification components
+import NotificationSnackbar from "./NotificationSnackbar";
+import { useNotification } from "../hooks/useNotification";
+
 const Projects = ({ projects, loading, onAddProject, onAddTask, onEditProject, fetchProjects, changeView }) => {
   const [deleteDialogProject, setDeleteDialogProject] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const { error, success, showError, clearNotifications } = useNotification();
 
   // Helper function for real-time subscription check
   const checkSubscriptionStatus = async () => {
@@ -30,18 +35,20 @@ const Projects = ({ projects, loading, onAddProject, onAddTask, onEditProject, f
       setDeleteDialogProject(null);
       if (fetchProjects) await fetchProjects();
     } catch (err) {
-      alert("Failed to delete project: " + err.message);
+      showError("Failed to delete project: " + err.message);
     } finally {
       setIsDeleting(false);
     }
   };
+
+
 
   return (
     <div className="projects-container">
       <button className="add-btn" onClick={async () => {
           const isCurrentlySubscribed = await checkSubscriptionStatus();
           if (!isCurrentlySubscribed) {
-              alert('Subscription required');
+              showError('Subscription required');
               return;
           }
           onAddProject();
@@ -96,6 +103,13 @@ const Projects = ({ projects, loading, onAddProject, onAddTask, onEditProject, f
           </div>
         </div>
       )}
+
+      {/* Notification Snackbar */}
+      <NotificationSnackbar 
+        error={error}
+        success={success}
+        onClose={clearNotifications}
+      />
     </div>
   );
 };
