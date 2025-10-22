@@ -7,7 +7,7 @@ function NotificationSnackbar({
     success, 
     onClose, 
     autoHideDuration = 6000,
-    anchorOrigin = { vertical: "bottom", horizontal: "center" }
+    anchorOrigin = { vertical: "bottom", horizontal: "right" }
 }) {
     const handleClose = (event, reason) => {
         if (reason === "clickaway") {
