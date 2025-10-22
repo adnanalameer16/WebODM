@@ -217,7 +217,7 @@ export default function CreateNewTask({ exit, redirect, projectId, onTaskCreated
     const [gcpFile, setGcpFile] = useState(null);
     const [step, setStep] = useState(1);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const { error, success, showError, showSuccess, clearNotifications } = useNotification();
+    const { error, success, showError, clearNotifications } = useNotification();
     const [progress,setProgress]=useState(0.0);
 
     const nextStep = () => {
@@ -258,7 +258,6 @@ export default function CreateNewTask({ exit, redirect, projectId, onTaskCreated
             });
             console.log("Response:", response.data);
             const id=response.data.id
-            showSuccess("Task created successfully!");
             if (onTaskCreated) {
                 onTaskCreated(); // Notify parent component about task creation
             }
@@ -319,7 +318,6 @@ export default function CreateNewTask({ exit, redirect, projectId, onTaskCreated
             const responses = await Promise.all(uploadPromises);
 
             console.log("All files uploaded successfully! ✅");
-            showSuccess("Uploading Complete");
             responses.forEach(response => {
                 console.log(response.data);
             });
@@ -440,7 +438,6 @@ export default function CreateNewTask({ exit, redirect, projectId, onTaskCreated
 
 
                     {error && <div style={{ color: 'red', marginTop: '10px' }}>Error: {error}</div>}
-                    {success && <div style={{ color: 'green', marginTop: '10px' }}>{success}</div>}
                 </div>
             )}
             </div>
@@ -457,7 +454,7 @@ export default function CreateNewTask({ exit, redirect, projectId, onTaskCreated
             {/* Notification Snackbar */}
             <NotificationSnackbar 
                 error={error}
-                success={success}
+                success={null}
                 onClose={clearNotifications}
             />
         </div>
