@@ -3,13 +3,14 @@ import { authorizedFetch } from '../utils/api.js';
 import ProjectBox from './Project_box';
 import './Projects.css';
 import AddIcon from "@mui/icons-material/Add";
-import {Grid, Skeleton} from "@mui/material";
+import SortIcon from "@mui/icons-material/Sort";
+import {Grid, Skeleton, FormControl, Select, MenuItem, InputLabel, Box} from "@mui/material";
 
 // Import reusable notification components
 import NotificationSnackbar from "./NotificationSnackbar";
 import { useNotification } from "../hooks/useNotification";
 
-const Projects = ({ projects, loading, onAddProject, onAddTask, onEditProject, fetchProjects, changeView, onShowDeleteDialog }) => {
+const Projects = ({ projects, loading, onAddProject, onAddTask, onEditProject, fetchProjects, changeView, onShowDeleteDialog, sortBy, onSortChange }) => {
   const { error, success, showError, clearNotifications } = useNotification();
 
   // Helper function for real-time subscription check
@@ -30,18 +31,48 @@ const Projects = ({ projects, loading, onAddProject, onAddTask, onEditProject, f
 
   return (
     <div className="projects-container">
-      <button className="add-btn" onClick={async () => {
-          const isCurrentlySubscribed = await checkSubscriptionStatus();
-          if (!isCurrentlySubscribed) {
-              showError('Subscription required');
-              return;
-          }
-          onAddProject();
-      }}>
-        New Project
-          <AddIcon sx={{marginLeft:2}}/>
-
-      </button>
+      <div className="projects-header">
+        <button className="add-btn" onClick={async () => {
+            const isCurrentlySubscribed = await checkSubscriptionStatus();
+            if (!isCurrentlySubscribed) {
+                showError('Subscription required');
+                return;
+            }
+            onAddProject();
+        }}>
+          New Project
+            <AddIcon sx={{marginLeft:2}}/>
+        </button>
+        
+        <Box className="sort-controls">
+          <FormControl variant="outlined" size="small" sx={{ minWidth: 200 }}>
+            <Select
+              value={sortBy}
+              onChange={(e) => onSortChange(e.target.value)}
+              displayEmpty
+              sx={{
+                backgroundColor: 'white',
+                '& .MuiOutlinedInput-notchedOutline': {
+                  borderColor: 'gray',
+                },
+                '&:hover .MuiOutlinedInput-notchedOutline': {
+                  borderColor: 'rgb(52, 183, 255)',
+                },
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                  borderColor: 'rgb(52, 183, 255)',
+                }
+              }}
+            >
+              <MenuItem value="date-desc">Date Created (Newest First)</MenuItem>
+              <MenuItem value="date-asc">Date Created (Oldest First)</MenuItem>
+              <MenuItem value="name-asc">Name (A to Z)</MenuItem>
+              <MenuItem value="name-desc">Name (Z to A)</MenuItem>
+              <MenuItem value="tasks-desc">Tasks (Most to Least)</MenuItem>
+              <MenuItem value="tasks-asc">Tasks (Least to Most)</MenuItem>
+            </Select>
+          </FormControl>
+        </Box>
+      </div>
       {loading ? (
           <Grid container spacing={3}> {/* spacing adds gaps between items */}
               {/* Map over an array to create 9 items */}
