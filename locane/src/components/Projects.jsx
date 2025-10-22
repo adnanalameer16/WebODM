@@ -5,9 +5,12 @@ import './Projects.css';
 import AddIcon from "@mui/icons-material/Add";
 import {Grid, Skeleton} from "@mui/material";
 
-const Projects = ({ projects, loading, onAddProject, onAddTask, onEditProject, fetchProjects, changeView }) => {
-  const [deleteDialogProject, setDeleteDialogProject] = useState(null);
-  const [isDeleting, setIsDeleting] = useState(false);
+// Import reusable notification components
+import NotificationSnackbar from "./NotificationSnackbar";
+import { useNotification } from "../hooks/useNotification";
+
+const Projects = ({ projects, loading, onAddProject, onAddTask, onEditProject, fetchProjects, changeView, onShowDeleteDialog }) => {
+  const { error, success, showError, clearNotifications } = useNotification();
 
   // Helper function for real-time subscription check
   const checkSubscriptionStatus = async () => {
@@ -21,27 +24,16 @@ const Projects = ({ projects, loading, onAddProject, onAddTask, onEditProject, f
     }
   };
 
-  const handleDeleteProject = async (project) => {
-    setIsDeleting(true);
-    try {
-      await authorizedFetch(`/api/projects/${project.id}/`, {
-        method: "DELETE",
-      });
-      setDeleteDialogProject(null);
-      if (fetchProjects) await fetchProjects();
-    } catch (err) {
-      alert("Failed to delete project: " + err.message);
-    } finally {
-      setIsDeleting(false);
-    }
-  };
+
+
+
 
   return (
     <div className="projects-container">
       <button className="add-btn" onClick={async () => {
           const isCurrentlySubscribed = await checkSubscriptionStatus();
           if (!isCurrentlySubscribed) {
-              alert('Subscription required');
+              showError('Subscription required');
               return;
           }
           onAddProject();
@@ -79,23 +71,20 @@ const Projects = ({ projects, loading, onAddProject, onAddTask, onEditProject, f
               project={proj}
               onAddTask={() => onAddTask(proj.id)}
               onEditProject={onEditProject}
-              onShowDeleteDialog={setDeleteDialogProject}
+              onShowDeleteDialog={onShowDeleteDialog}
               changeView={changeView}
             />
           ))}
         </div>
       )}
-      {deleteDialogProject && (
-        <div className="modal-overlay">
-          <div className="dialog">
-            <p>Are you sure you want to delete this project?</p>
-            <div className="delete-dialog-actions">
-              <button onClick={() => handleDeleteProject(deleteDialogProject)} className="delete-dialog-btn" disabled={isDeleting}>Yes</button>
-              <button onClick={() => setDeleteDialogProject(null)} className="delete-dialog-btn no" disabled={isDeleting}>No</button>
-            </div>
-          </div>
-        </div>
-      )}
+
+
+      {/* Notification Snackbar */}
+      <NotificationSnackbar 
+        error={error}
+        success={success}
+        onClose={clearNotifications}
+      />
     </div>
   );
 };

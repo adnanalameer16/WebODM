@@ -17,10 +17,13 @@ import { Turn as Hamburger } from 'hamburger-react';
 import {AdminPanelSettingsRounded, FolderRounded, GpsNotFixedRounded} from "@mui/icons-material";
 import {Divider} from "@mui/material";
 import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded';
-function Sidebar({ changeView, activeView, setShowLogoutDialog,isSuperuser, onProfileClick }) {
+
+function Sidebar({ changeView, activeView, setActiveDialog, isSuperuser, onProfileClick }) {
+
+
+
       const [isCollapsed, setIsCollapsed] = useState(false);
 
-    const doDashboard = () => changeView("dash");
     const doProjects = () => changeView("proj");
     const doTasks = () => changeView("tasks");
     const doGcp = () => changeView("gcp");
@@ -46,10 +49,6 @@ function Sidebar({ changeView, activeView, setShowLogoutDialog,isSuperuser, onPr
             </div>
             <Divider />
             <div className="sidebar-content" >
-                <button className={activeView === "dash" ? "isfocused" : "notfocused"} onClick={doDashboard}>
-                    <HomeRounded />
-                    {!isCollapsed && <span>Dashboard</span>}
-                </button>
                 <button className={activeView === "proj" ? "isfocused" : "notfocused"} onClick={doProjects}>
                     <FolderRounded/>
                     {!isCollapsed && <span>Projects</span>}
@@ -68,7 +67,7 @@ function Sidebar({ changeView, activeView, setShowLogoutDialog,isSuperuser, onPr
                         {!isCollapsed && <span>Administration</span>}
                     </button>
                 )}
-                <button onClick={() => setShowLogoutDialog(true)} className="sidebar-logout">
+                <button onClick={() => setActiveDialog("logout")} className="sidebar-logout">
                     <img src={logoutIcon} alt="Logout" />
                 </button>
             </div>
