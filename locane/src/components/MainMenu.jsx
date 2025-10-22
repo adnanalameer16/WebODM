@@ -533,10 +533,12 @@ export default function MainMenu({ setIsLogged, username, isSuperuser, setIsSupe
             {activeDialog === "delete-project" && deleteProject && (
                 <div className="modal-overlay">
                     <div className="dialog no-close">
+                        <div className="delete-container">
                         <p>Are you sure you want to delete this project?</p>
                         <div className="delete-dialog-actions">
                             <button onClick={() => handleDeleteProject(deleteProject)} className="delete-dialog-btn" disabled={isDeleting}>Yes</button>
                             <button onClick={() => setActiveDialog("none")} className="delete-dialog-btn no" disabled={isDeleting}>No</button>
+                        </div>
                         </div>
                     </div>
                 </div>
