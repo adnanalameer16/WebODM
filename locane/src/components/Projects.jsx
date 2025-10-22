@@ -65,10 +65,10 @@ const Projects = ({ projects, loading, onAddProject, onAddTask, onEditProject, f
             >
               <MenuItem value="date-desc">Date Created (Newest First)</MenuItem>
               <MenuItem value="date-asc">Date Created (Oldest First)</MenuItem>
-              <MenuItem value="name-asc">Name (A to Z)</MenuItem>
-              <MenuItem value="name-desc">Name (Z to A)</MenuItem>
               <MenuItem value="tasks-desc">Tasks (Most to Least)</MenuItem>
               <MenuItem value="tasks-asc">Tasks (Least to Most)</MenuItem>
+              <MenuItem value="name-asc">Name (A to Z)</MenuItem>
+              <MenuItem value="name-desc">Name (Z to A)</MenuItem>
             </Select>
           </FormControl>
         </Box>
