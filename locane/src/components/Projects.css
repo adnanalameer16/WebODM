@@ -12,10 +12,11 @@
 
 
 
-.add-btn {background-image: linear-gradient(to right, rgb(52, 183, 255) 0%, #88cff5 51%, rgba(31, 162, 255, 0.75) 100%)}
+.add-btn {background-image: linear-gradient(to right, rgb(52, 183, 255) 0%, #88cff5 51%, rgba(31, 162, 255, 0.75) 100%);
+    transition: 0.5s;}
 .add-btn {
     width: 290px;
-    ;
+
     color: white;
 
     border: none;
@@ -47,6 +48,14 @@
     color: #fff;
     text-decoration: none;
     translate: 1px -4px;
+    transition: 0.5s;
+}
+.add-btn h1{
+    font-size: 1.2rem !important;
+    font-weight: 600 !important;
+    color: #ffffff !important;
+
+
 }
 
 

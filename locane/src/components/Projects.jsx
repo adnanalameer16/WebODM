@@ -38,7 +38,7 @@ const Projects = ({ projects, loading, onAddProject, onAddTask, onEditProject, f
           }
           onAddProject();
       }}>
-        New Project
+          <h1 >New Project</h1>
           <AddIcon sx={{marginLeft:2}}/>
 
       </button>

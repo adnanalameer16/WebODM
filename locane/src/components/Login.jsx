@@ -127,6 +127,7 @@ function Login({ setIsLogged, setUserDetails }) {
             <h1>WELCOME !</h1>
 
             <form className="login-form" onSubmit={handleSubmit}>
+
                 <div className={"lbl"}>Username</div>
                 <input
                     type="text"
@@ -148,12 +149,13 @@ function Login({ setIsLogged, setUserDetails }) {
                 </button>
             </form>
 
-            {/* Notification Snackbar */}
+
             <NotificationSnackbar 
                 error={error}
                 success={success}
                 onClose={clearNotifications}
             />
+
         </div>
     );
 }

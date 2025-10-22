@@ -266,7 +266,7 @@ const Tasks = ({ runningTasks, loading, onRefresh, onTaskAction ,isViewing,exitV
     return (
       <div className="tasks-container">
         <div className="view-header">
-          <h2>Tasks</h2>
+          <h1>Tasks</h1>
 
           <IconButton aria-label={"refresh"} onClick={onRefresh}><RefreshRoundedIcon/></IconButton>
 
