@@ -403,13 +403,14 @@ const Tasks = ({ runningTasks, loading, onRefresh, onTaskAction ,isViewing,exitV
         {deleteDialogTask && (
           <div className="modal-overlay">
             <div className="dialog">
+                <div className="delete-container" >
               <p>Are you sure you want to {deleteDialogTask.actionType === 'cancel' ? 'cancel' : 'delete'} this task?</p>
               <div className="delete-dialog-actions">
                 <button onClick={() => { handleDialogAction(deleteDialogTask, deleteDialogTask.actionType); }} className="delete-dialog-btn">Yes</button>
                 <button onClick={() => {
                   setDeleteDialogTask(null);
                   setIsDeleteDialogOpen(false);
-                }} className="delete-dialog-btn no">No</button>
+                }} className="delete-dialog-btn no">No</button></div>
               </div>
             </div>
           </div>

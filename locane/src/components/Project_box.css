@@ -227,6 +227,13 @@
     margin-right: 10px;
 
 }
+.delete-icon:hover{
+    background: none !important;
+    cursor: pointer;
+    scale: 1.2;
+    transition: scale 0.2s ease;
+
+}
 .save-link {
   background-color: #28a745;
   color: white;
@@ -244,12 +251,15 @@
 .cancel-link:hover {
   background-color: #545b62;
 }
-
+.delete-container{
+    margin: 15px;
+}
 /* Delete dialog actions */
 .delete-dialog-actions {
   display: flex;
-  gap: 1rem;
-  justify-content: center;
+
+  justify-content: space-between;
+    width: 100%;
 }
 
 .delete-dialog-btn {
@@ -261,6 +271,8 @@
   cursor: pointer;
   font-weight: 500;
   transition: background-color 0.2s ease;
+    width: 100%;
+    margin:0 !important;
 }
 
 .delete-dialog-btn:hover {
