@@ -44,9 +44,9 @@ function Sidebar({ changeView, activeView, setActiveDialog, isSuperuser, onProfi
                     </button>
                 )}
             </div>
-            <div className='profile'>
+
                 <ProfileInfo isCollapsed={isCollapsed}/>
-            </div>
+
             <Divider />
             <div className="sidebar-content" >
                 <button className={activeView === "proj" ? "isfocused" : "notfocused"} onClick={doProjects}>
