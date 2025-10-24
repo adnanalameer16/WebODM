@@ -30,7 +30,9 @@
     top: 10px;
     cursor: pointer;
 }
-
+.sidebar.collapsed .profile-img-wrapper  {
+    margin-left:10px
+}
 /* Animate the position to the right side on hover */
 .sidebar:hover {
 
@@ -42,6 +44,11 @@
     width: 80px;
     min-width: 80px;
     padding-right:8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
 }
 
 .sidebar-header {
@@ -106,10 +113,11 @@
     transition: all 0.3s ease;
 }
 
-.sidebar.collapsed .profile {
+.sidebar.collapsed .profile-info {
     margin-bottom: 20px;
     transform: scale(0.7);
 }
+
 
 .sidebar-content {
     width: 100%;
